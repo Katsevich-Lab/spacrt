@@ -4,6 +4,7 @@ Version: 0.1.0
 Authors@R: 
     person("Jyotishka", "Ray Choudhury", , "jyotishka.stat@gmail.com", role = c("aut", "cre"))
 Description: Saddlepoint approximation-based conditional randomization test
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
