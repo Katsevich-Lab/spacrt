@@ -24,7 +24,4 @@ CGF of the weighted distribution evaluated at \code{s}.
 \code{d1_wcgf} is a function computing the derivative of the cumulant generating
 function (CGF) of distributions, multiplied by a weight function, from GLM family
 }
-\examples{
-spacrt:::d1_wcgf(s = 5, P = c(1,1,2), W = c(1,1,1), fam = 'poisson')
-}
 \keyword{internal}
