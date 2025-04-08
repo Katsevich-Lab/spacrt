@@ -266,7 +266,6 @@ nb_precomp <- function(data){
 #' @param fitting_method The fitting method for the regressions X on Z and Y on Z.
 #' @param fit_vals_own Fitted values of X_on_Z and Y_on_Z based on user's own method
 #' @return Simulated data from an appropriate distribution.
-#' @importFrom stats predict
 #' @keywords internal
 fit_models <- function(data,
                        X_on_Z_fam, Y_on_Z_fam,
