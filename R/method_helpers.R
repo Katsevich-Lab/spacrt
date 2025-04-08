@@ -8,7 +8,7 @@
 #' @param fam The GLM family which includes the distribution whose CGF is being
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @param R stats::uniroot() search space endpoint
-#' @param max_expansions Maximum number of times stats::uniroot() search space shuold be broadened
+#' @param max_expansions Maximum number of times stats::uniroot() search space should be broadened
 #' @return Simulated data from an appropriate distribution.
 #'
 #' @examples
@@ -19,10 +19,11 @@
 #' X <- data$X; Y <- data$Y; Z <- data$Z
 #' X_on_Z_fit <- suppressWarnings(stats::glm(X ~ Z, family = "binomial"))
 #' Y_on_Z_fit <- suppressWarnings(stats::glm(Y ~ Z, family = "poisson"))
-#' spa_cdf(X = X, Y = Y, X_on_Z_fit_vals = X_on_Z_fit$fitted.values,
-#'  Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values, fam = "binomial", R = 1000)
+#' spacrt:::spa_cdf(X = X, Y = Y,
+#'                  X_on_Z_fit_vals = X_on_Z_fit$fitted.values,
+#'                  Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values,
+#'                  fam = "binomial", R = 1000)
 #'
-#' @export
 spa_cdf <- function(X, Y, X_on_Z_fit_vals, Y_on_Z_fit_vals, fam, R, max_expansions = 10){
 
   P <- X_on_Z_fit_vals
@@ -45,7 +46,7 @@ spa_cdf <- function(X, Y, X_on_Z_fit_vals, Y_on_Z_fit_vals, fam, R, max_expansio
     tryCatch({
       # solve the saddlepoint equation
       s.hat <- stats::uniroot(
-        f = function(s) d1.wcgf(s, P = P, W = W, fam) - sqrt(n)*t,
+        f = function(s) d1_wcgf(s, P = P, W = W, fam) - sqrt(n)*t,
         lower = current_lower, upper = current_upper, tol = .Machine$double.eps)$root
 
       success_uniroot <- TRUE
@@ -68,7 +69,7 @@ spa_cdf <- function(X, Y, X_on_Z_fit_vals, Y_on_Z_fit_vals, fam, R, max_expansio
 
         # Lugannani-Rice formula
         p.left <- stats::pnorm(r.hat) + stats::dnorm(r.hat) *
-          (1/r.hat - 1/(s.hat*sqrt(spacrt::d2.wcgf(s = s.hat, P = P, W = W, fam))))
+          (1/r.hat - 1/(s.hat*sqrt(spacrt::d2_wcgf(s = s.hat, P = P, W = W, fam))))
       })
 
       # decide if p.left is NA or beyond the range [0, 1] or not
@@ -105,11 +106,10 @@ spa_cdf <- function(X, Y, X_on_Z_fit_vals, Y_on_Z_fit_vals, fam, R, max_expansio
 #' @param fam The GLM family which includes the distribution whose CGF is being
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @return Simulated data from an appropriate distribution.
-#'
+#' @keywords internal
 #' @examples
-#' dCRT_dist(n = 5, fitted.val = c(1,2,1,1,1), fam = 'poisson')
+#' spacrt:::dCRT_dist(n = 5, fitted.val = c(1,2,1,1,1), fam = 'poisson')
 #'
-#' @export
 dCRT_dist <- function(n, fitted.val, fam){
 
   if(fam == 'binomial') return(stats::rbinom(n = n, size = 1, prob = fitted.val))
@@ -133,11 +133,10 @@ dCRT_dist <- function(n, fitted.val, fam){
 #' @param fam The GLM family which includes the distribution whose CGF is being
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @return CGF of the weighted distribution evaluated at \code{s}.
-#'
+#' @keywords internal
 #' @examples
-#' wcgf(s = 5, P = c(1,1,2), W = c(1,1,1), fam = 'poisson')
+#' spacrt:::wcgf(s = 5, P = c(1,1,2), W = c(1,1,1), fam = 'poisson')
 #'
-#' @export
 wcgf <- function(s, P, W, fam){
 
   if(fam == 'binomial') return(sum(log(exp(s*W)*P + 1 - P)))
@@ -152,7 +151,7 @@ wcgf <- function(s, P, W, fam){
 
 
 #####################################################################################
-#' \code{d1.wcgf} is a function computing the derivative of the cumulant generating
+#' \code{d1_wcgf} is a function computing the derivative of the cumulant generating
 #' function (CGF) of distributions, multiplied by a weight function, from GLM family
 #'
 #' @param s The point where the CGF will be computed.
@@ -161,12 +160,10 @@ wcgf <- function(s, P, W, fam){
 #' @param fam The GLM family which includes the distribution whose CGF is being
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @return CGF of the weighted distribution evaluated at \code{s}.
-#'
+#' @keywords internal
 #' @examples
-#' d1.wcgf(s = 5, P = c(1,1,2), W = c(1,1,1), fam = 'poisson')
-#'
-#' @export
-d1.wcgf <- function(s, P, W, fam){
+#' spacrt:::d1_wcgf(s = 5, P = c(1,1,2), W = c(1,1,1), fam = 'poisson')
+d1_wcgf <- function(s, P, W, fam){
 
   # if(fam == 'binomial') return(sum((W*P*exp(s*W)) / (exp(s*W)*P + 1 - P)))
   if(fam == 'binomial') return(sum((W*P) / (P + (1 - P) * exp(-s*W))))
@@ -180,8 +177,8 @@ d1.wcgf <- function(s, P, W, fam){
 }
 
 
-#####################################################################################
-#' \code{d2.wcgf} is a function computing the hessian of the cumulant generating
+####################################################################################
+#' \code{d2_wcgf} is a function computing the hessian of the cumulant generating
 #' function (CGF) of distributions, multiplied by a weight function, from GLM family
 #'
 #' @param s The point where the CGF will be computed.
@@ -190,12 +187,11 @@ d1.wcgf <- function(s, P, W, fam){
 #' @param fam The GLM family which includes the distribution whose CGF is being
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @return CGF of the weighted distribution evaluated at \code{s}.
-#'
+#' @keywords internal
 #' @examples
-#' d2.wcgf(s = 5, P = c(1,1,2), W = c(1,1,1), fam = 'poisson')
+#' spacrt:::d2_wcgf(s = 5, P = c(1,1,2), W = c(1,1,1), fam = 'poisson')
 #'
-#' @export
-d2.wcgf <- function(s, P, W, fam){
+d2_wcgf <- function(s, P, W, fam){
 
   if(fam == 'binomial'){
     Q <- 1 - P
@@ -239,20 +235,20 @@ d2.wcgf <- function(s, P, W, fam){
 }
 
 
-#####################################################################################
-#' A function computing the dispersion parameter in negative binomial regression
+#######################################################################################################
+#' \code{nb_precomp} is a function computing the dispersion parameter in negative binomial regression
 #'
 #' @param data A list containing the response Y and covariate Z
-#'
+#' @keywords internal
 #' @return a list containing the Poisson model fitted values and estimate for dispersion
-#' @export
+#'
 nb_precomp <- function(data){
 
   Y <- data$Y; Z <- data$Z
 
   pois_fit <- stats::glm.fit(y = Y, x = Z, family = stats::poisson())
 
-  theta_hat <- sceptre:::estimate_theta(
+  theta_hat <- estimate_theta(
     y = Y,
     mu = pois_fit$fitted.values,
     dfr = pois_fit$df.residual,
@@ -283,7 +279,7 @@ nb_precomp <- function(data){
 #' @param fit_vals_own Fitted values of X_on_Z and Y_on_Z based on user's own method
 #' @return Simulated data from an appropriate distribution.
 #' @importFrom stats predict
-#'
+#' @keywords internal
 #' @examples
 #' n <- 100; p <- 5
 #' data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
@@ -292,8 +288,8 @@ nb_precomp <- function(data){
 #' X_on_Z_fam <- "binomial"
 #' Y_on_Z_fam <- "binomial"
 #' fitting_method <- "rf"
-#' fitted_vals <- fit_models(data, X_on_Z_fam, Y_on_Z_fam, fitting_method)
-#' @export
+#' fitted_vals <- spacrt:::fit_models(data, X_on_Z_fam, Y_on_Z_fam, fitting_method)
+#'
 fit_models <- function(data,
                        X_on_Z_fam, Y_on_Z_fam,
                        fitting_method = 'glm',
