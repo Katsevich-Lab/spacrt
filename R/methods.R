@@ -22,7 +22,8 @@
 #'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
 #' X_on_Z_fam <- "binomial"
 #' Y_on_Z_fam <- "poisson"
-#' results <- GCM(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = 'glm')
+#' results <- GCM(data, X_on_Z_fam, Y_on_Z_fam,
+#'                fitting_method = 'glm')
 #'
 #' @export
 GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
@@ -86,8 +87,9 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
 #' X_on_Z_fam <- "binomial"
 #' Y_on_Z_fam <- "poisson"
-#' results <- dCRT(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = 'glm', B = 2000,
-#'  normalize, return_resamples)
+#' results <- dCRT(data, X_on_Z_fam, Y_on_Z_fam,
+#'                 fitting_method = 'glm', B = 2000,
+#'                 normalize, return_resamples)
 #'
 #' @export
 dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
@@ -170,7 +172,7 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
 #' X_on_Z_fam <- "binomial"
 #' Y_on_Z_fam <- "poisson"
-#' results <- spaCRT(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = 'glm', normalize)
+#' spaCRT(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = 'glm', normalize)
 #'
 #' n <- 50; p <- 4; normalize <- FALSE; return_cdf <- FALSE
 #' data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
@@ -178,7 +180,7 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
 #' X_on_Z_fam <- "binomial"
 #' Y_on_Z_fam <- "binomial"
-#' results <- spaCRT(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = "rf")
+#' spaCRT(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = "rf")
 #'
 #' @export
 spaCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
