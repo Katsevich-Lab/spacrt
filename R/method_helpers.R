@@ -107,9 +107,6 @@ spa_cdf <- function(X, Y, X_on_Z_fit_vals, Y_on_Z_fit_vals, fam, R, max_expansio
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @return Simulated data from an appropriate distribution.
 #' @keywords internal
-#' @examples
-#' spacrt:::dCRT_dist(n = 5, fitted.val = c(1,2,1,1,1), fam = 'poisson')
-#'
 dCRT_dist <- function(n, fitted.val, fam){
 
   if(fam == 'binomial') return(stats::rbinom(n = n, size = 1, prob = fitted.val))
@@ -134,9 +131,6 @@ dCRT_dist <- function(n, fitted.val, fam){
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @return CGF of the weighted distribution evaluated at \code{s}.
 #' @keywords internal
-#' @examples
-#' spacrt:::wcgf(s = 5, P = c(1,1,2), W = c(1,1,1), fam = 'poisson')
-#'
 wcgf <- function(s, P, W, fam){
 
   if(fam == 'binomial') return(sum(log(exp(s*W)*P + 1 - P)))
@@ -161,8 +155,6 @@ wcgf <- function(s, P, W, fam){
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @return CGF of the weighted distribution evaluated at \code{s}.
 #' @keywords internal
-#' @examples
-#' spacrt:::d1_wcgf(s = 5, P = c(1,1,2), W = c(1,1,1), fam = 'poisson')
 d1_wcgf <- function(s, P, W, fam){
 
   # if(fam == 'binomial') return(sum((W*P*exp(s*W)) / (exp(s*W)*P + 1 - P)))
@@ -188,9 +180,6 @@ d1_wcgf <- function(s, P, W, fam){
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @return CGF of the weighted distribution evaluated at \code{s}.
 #' @keywords internal
-#' @examples
-#' spacrt:::d2_wcgf(s = 5, P = c(1,1,2), W = c(1,1,1), fam = 'poisson')
-#'
 d2_wcgf <- function(s, P, W, fam){
 
   if(fam == 'binomial'){
@@ -239,9 +228,8 @@ d2_wcgf <- function(s, P, W, fam){
 #' \code{nb_precomp} is a function computing the dispersion parameter in negative binomial regression
 #'
 #' @param data A list containing the response Y and covariate Z
-#' @keywords internal
 #' @return a list containing the Poisson model fitted values and estimate for dispersion
-#'
+#' @keywords internal
 nb_precomp <- function(data){
 
   Y <- data$Y; Z <- data$Z
@@ -280,16 +268,6 @@ nb_precomp <- function(data){
 #' @return Simulated data from an appropriate distribution.
 #' @importFrom stats predict
 #' @keywords internal
-#' @examples
-#' n <- 100; p <- 5
-#' data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
-#'              Y = rbinom(n = n, size = 1, prob = 0.7),
-#'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
-#' X_on_Z_fam <- "binomial"
-#' Y_on_Z_fam <- "binomial"
-#' fitting_method <- "rf"
-#' fitted_vals <- spacrt:::fit_models(data, X_on_Z_fam, Y_on_Z_fam, fitting_method)
-#'
 fit_models <- function(data,
                        X_on_Z_fam, Y_on_Z_fam,
                        fitting_method = 'glm',
