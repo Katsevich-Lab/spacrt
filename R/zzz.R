@@ -1,6 +1,7 @@
 .onLoad <- function(libname, pkgname) {
-  # Assign estimate_theta to a variable in your package's namespace
+  # Dynamically retrieve the unexported function from the sceptre namespace
   if (requireNamespace("sceptre", quietly = TRUE)) {
-    assign("estimate_theta", sceptre:::estimate_theta, envir = parent.env(environment()))
+    estimate_theta <- get("estimate_theta", envir = asNamespace("sceptre"))
+    assign("estimate_theta", estimate_theta, envir = parent.env(environment()))
   }
 }
