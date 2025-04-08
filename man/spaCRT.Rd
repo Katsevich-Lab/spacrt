@@ -55,7 +55,7 @@ data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
 X_on_Z_fam <- "binomial"
 Y_on_Z_fam <- "poisson"
-results <- spaCRT(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = 'glm', normalize)
+spaCRT(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = 'glm', normalize)
 
 n <- 50; p <- 4; normalize <- FALSE; return_cdf <- FALSE
 data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
@@ -63,6 +63,6 @@ data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
 X_on_Z_fam <- "binomial"
 Y_on_Z_fam <- "binomial"
-results <- spaCRT(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = "rf")
+spaCRT(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = "rf")
 
 }

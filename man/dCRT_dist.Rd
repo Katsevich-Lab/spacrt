@@ -24,6 +24,7 @@ Simulated data from an appropriate distribution.
 distribution depending on a specified  GLM family
 }
 \examples{
-dCRT_dist(n = 5, fitted.val = c(1,2,1,1,1), fam = 'poisson')
+spacrt:::dCRT_dist(n = 5, fitted.val = c(1,2,1,1,1), fam = 'poisson')
 
 }
+\keyword{internal}

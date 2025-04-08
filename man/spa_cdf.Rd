@@ -20,7 +20,7 @@ evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 
 \item{R}{stats::uniroot() search space endpoint}
 
-\item{max_expansions}{Maximum number of times stats::uniroot() search space shuold be broadened}
+\item{max_expansions}{Maximum number of times stats::uniroot() search space should be broadened}
 }
 \value{
 Simulated data from an appropriate distribution.
@@ -36,7 +36,9 @@ data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
 X <- data$X; Y <- data$Y; Z <- data$Z
 X_on_Z_fit <- suppressWarnings(stats::glm(X ~ Z, family = "binomial"))
 Y_on_Z_fit <- suppressWarnings(stats::glm(Y ~ Z, family = "poisson"))
-spa_cdf(X = X, Y = Y, X_on_Z_fit_vals = X_on_Z_fit$fitted.values,
- Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values, fam = "binomial", R = 1000)
+spacrt:::spa_cdf(X = X, Y = Y,
+                 X_on_Z_fit_vals = X_on_Z_fit$fitted.values,
+                 Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values,
+                 fam = "binomial", R = 1000)
 
 }

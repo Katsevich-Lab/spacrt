@@ -51,7 +51,8 @@ data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
 X_on_Z_fam <- "binomial"
 Y_on_Z_fam <- "poisson"
-results <- dCRT(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = 'glm', B = 2000,
- normalize, return_resamples)
+results <- dCRT(data, X_on_Z_fam, Y_on_Z_fam,
+                fitting_method = 'glm', B = 2000,
+                normalize, return_resamples)
 
 }
