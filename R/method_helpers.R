@@ -23,7 +23,7 @@
 #'                  X_on_Z_fit_vals = X_on_Z_fit$fitted.values,
 #'                  Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values,
 #'                  fam = "binomial", R = 1000)
-#'
+#' @noRd
 spa_cdf <- function(X, Y, X_on_Z_fit_vals, Y_on_Z_fit_vals, fam, R, max_expansions = 10){
 
   P <- X_on_Z_fit_vals
@@ -65,11 +65,11 @@ spa_cdf <- function(X, Y, X_on_Z_fit_vals, Y_on_Z_fit_vals, fam, R, max_expansio
   if(success_uniroot == TRUE && {
       suppressWarnings({
         r.hat <- sign(s.hat) * sqrt(2 * (sqrt(n)* s.hat * t -
-                                         spacrt::wcgf(s = s.hat, P = P, W = W, fam)))
+                                         wcgf(s = s.hat, P = P, W = W, fam)))
 
         # Lugannani-Rice formula
         p.left <- stats::pnorm(r.hat) + stats::dnorm(r.hat) *
-          (1/r.hat - 1/(s.hat*sqrt(spacrt::d2_wcgf(s = s.hat, P = P, W = W, fam))))
+          (1/r.hat - 1/(s.hat*sqrt(d2_wcgf(s = s.hat, P = P, W = W, fam))))
       })
 
       # decide if p.left is NA or beyond the range [0, 1] or not
