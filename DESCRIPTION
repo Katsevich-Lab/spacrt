@@ -1,10 +1,19 @@
 Package: spacrt
-Title: spacrt Package
+Title: Saddlepoint approximation-based conditional randomization test
 Version: 0.1.0
 Authors@R: 
     person("Jyotishka", "Ray Choudhury", , "jyotishka.stat@gmail.com", role = c("aut", "cre"))
-Description: Saddlepoint approximation-based conditional randomization test
+Description: The saddlepoint approximation-based conditional randomization test, abbreviated as `spaCRT`, is a fast and accurate method for testing conditional independence. By approximating the resampling distribution of the distilled conditional randomization test (dCRT) using saddlepoint approximation, spaCRT achieves similar statistical performance in terms of type-I error control, p-value calibration, and power; with substantially lower computational cost.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Imports: 
+    stats, MASS
+Suggests:
+    sceptre, statmod, grf, testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Collate:
+  'zzz.R'
+  'method_helpers.R'
+  'methods.R'
