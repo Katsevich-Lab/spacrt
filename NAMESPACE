@@ -2,5 +2,4 @@
 
 export(GCM)
 export(dCRT)
-export(score.test)
 export(spaCRT)
