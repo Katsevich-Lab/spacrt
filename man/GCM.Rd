@@ -4,7 +4,13 @@
 \alias{GCM}
 \title{The generalized covariance measure test of Shah and Peters.}
 \usage{
-GCM(data, X_on_Z_fam, Y_on_Z_fam, fitting_method = "glm")
+GCM(
+  data,
+  X_on_Z_fam,
+  Y_on_Z_fam,
+  fitting_X_on_Z = "glm",
+  fitting_Y_on_Z = "glm"
+)
 }
 \arguments{
 \item{data}{A named list with fields \code{X} (an nx1 vector for the predictor
@@ -17,7 +23,9 @@ variable of interest), \code{Y} (an nx1 response vector), and \code{Z}
 \item{Y_on_Z_fam}{The GLM family for the regression of Y on Z
 (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).}
 
-\item{fitting_method}{The fitting method for the regressions X on Z and Y on Z.}
+\item{fitting_X_on_Z}{The fitting method for the regression X on Z.}
+
+\item{fitting_Y_on_Z}{The fitting method for the regression Y on Z.}
 }
 \value{
 A named list with fields \code{test_stat} and \code{left_side_p_value},
@@ -34,6 +42,7 @@ data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
 X_on_Z_fam <- "binomial"
 Y_on_Z_fam <- "poisson"
 results <- GCM(data, X_on_Z_fam, Y_on_Z_fam,
-               fitting_method = 'glm')
+               fitting_X_on_Z = 'rf',
+               fitting_Y_on_Z = 'glm')
 
 }

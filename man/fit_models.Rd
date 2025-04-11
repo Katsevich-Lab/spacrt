@@ -8,8 +8,10 @@ fit_models(
   data,
   X_on_Z_fam,
   Y_on_Z_fam,
-  fitting_method = "glm",
-  fit_vals_own = NULL
+  fitting_X_on_Z = "glm",
+  fitting_Y_on_Z = "glm",
+  fit_vals_X_on_Z_own = NULL,
+  fit_vals_Y_on_Z_own = NULL
 )
 }
 \arguments{
@@ -23,12 +25,16 @@ variable of interest), \code{Y} (an nx1 response vector), and \code{Z}
 \item{Y_on_Z_fam}{The GLM family for the regression of Y on Z
 (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).}
 
-\item{fitting_method}{The fitting method for the regressions X on Z and Y on Z.}
+\item{fitting_X_on_Z}{The fitting method for the regression X on Z.}
 
-\item{fit_vals_own}{Fitted values of X_on_Z and Y_on_Z based on user's own method}
+\item{fitting_Y_on_Z}{The fitting method for the regression Y on Z.}
+
+\item{fit_vals_X_on_Z_own}{Fitted values of X_on_Z based on user's own method.}
+
+\item{fit_vals_Y_on_Z_own}{Fitted values of Y_on_Z based on user's own method.}
 }
 \value{
-Simulated data from an appropriate distribution.
+Fitted values.
 }
 \description{
 \code{fit_models} is a function carrying out the saddlepoint approximation to the
