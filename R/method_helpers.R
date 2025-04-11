@@ -9,7 +9,8 @@
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @param R stats::uniroot() search space endpoint
 #' @param max_expansions Maximum number of times stats::uniroot() search space should be broadened
-#' @return Simulated data from an appropriate distribution.
+#' @return \code{test statistic, left-sided p-value, right-sided p-value, both-sided p-value,} and \code{gcm.default}
+#' which specifies whether GCM was used as a backup.
 #'
 #' @examples
 #' n <- 100; p <- 2; normalize <- FALSE; return_cdf <- FALSE
@@ -106,6 +107,7 @@ spa_cdf <- function(X, Y, X_on_Z_fit_vals, Y_on_Z_fit_vals, fam, R, max_expansio
 #' @param fam The GLM family which includes the distribution whose CGF is being
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @return Simulated data from an appropriate distribution.
+#'
 #' @keywords internal
 dCRT_dist <- function(n, fitted.val, fam){
 
@@ -263,41 +265,29 @@ nb_precomp <- function(data){
 #' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @param Y_on_Z_fam The GLM family for the regression of Y on Z
 #' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
-#' @param fitting_method The fitting method for the regressions X on Z and Y on Z.
-#' @param fit_vals_own Fitted values of X_on_Z and Y_on_Z based on user's own method
-#' @return Simulated data from an appropriate distribution.
+#' @param fitting_X_on_Z The fitting method for the regression X on Z.
+#' @param fitting_Y_on_Z The fitting method for the regression Y on Z.
+#' @param fit_vals_X_on_Z_own Fitted values of X_on_Z based on user's own method.
+#' @param fit_vals_Y_on_Z_own Fitted values of Y_on_Z based on user's own method.
+#' @return Fitted values.
+#'
 #' @keywords internal
 fit_models <- function(data,
                        X_on_Z_fam, Y_on_Z_fam,
-                       fitting_method = 'glm',
-                       fit_vals_own = NULL){
+                       fitting_X_on_Z = 'glm',
+                       fitting_Y_on_Z = 'glm',
+                       fit_vals_X_on_Z_own = NULL,
+                       fit_vals_Y_on_Z_own = NULL){
 
    # extract (X,Y,Z) from inputted data
    X <- data$X; Y <- data$Y; Z <- data$Z
    additional_info <- list()
 
-   if(fitting_method == 'glm'){
+   if(fitting_X_on_Z == 'glm'){
       # fit X on Z regression when fitting method is glm
       X_on_Z_fit <- suppressWarnings(stats::glm(X ~ Z, family = X_on_Z_fam))
       X_on_Z_fit_vals <- X_on_Z_fit$fitted.values
-
-      # fit Y on Z regression when fitting method is glm
-      if(Y_on_Z_fam == "negative.binomial"){
-         aux_info_Y_on_Z <- nb_precomp(list(Y = Y, Z = Z))
-
-         Y_on_Z_fit <- stats::glm(Y ~ Z,
-                                  family = MASS::negative.binomial(aux_info_Y_on_Z$theta_hat),
-                                  mustart = aux_info_Y_on_Z$fitted_values) |> suppressWarnings()
-         Y_on_Z_fit_vals <- Y_on_Z_fit$fitted.values
-
-         additional_info$NB.disp.param <- aux_info_Y_on_Z$theta_hat
-      } else{
-         Y_on_Z_fit <- suppressWarnings(stats::glm(Y ~ Z, family = Y_on_Z_fam))
-         Y_on_Z_fit_vals <- Y_on_Z_fit$fitted.values
-
-         additional_info$NB.disp.param <- NA
-      }
-   } else if(fitting_method == 'rf' || fitting_method == "prob_forest"){
+   } else if(fitting_X_on_Z %in% c('rf','prob_forest')){
       # fit X on Z regression when fitting method is random forest
       if(X_on_Z_fam == "binomial"){
          p.forest.X <- grf::probability_forest(X = as.matrix(Z), Y = as.factor(X))
@@ -305,28 +295,52 @@ fit_models <- function(data,
 
          X_on_Z_fit_vals <- p.hat.X$predictions[ ,"1"]
       }
-
-      # fit Y on Z regression when fitting method is random forest
-      if(Y_on_Z_fam == "binomial"){
-         p.forest.Y <- grf::probability_forest(X = as.matrix(Z), Y = as.factor(Y))
-         p.hat.Y <- stats::predict(p.forest.Y, as.matrix(Z), estimate.variance = F)
-
-         Y_on_Z_fit_vals <- p.hat.Y$predictions[ ,"1"]
+   } else if(fitting_X_on_Z == 'own') {
+      # Validate that fit_vals_X_on_Z_own is provided and contains necessary components
+      if(is.numeric(fit_vals_X_on_Z_own)) {
+         stop("fit_vals_X_on_Z_own must be a vector containing 'X_on_Z_fit_vals' when using fitting_X_on_Z = 'own'")
       }
+      # Extract pre-computed values from fit_vals_X_on_Z_own
+      X_on_Z_fit_vals <- fit_vals_X_on_Z_own
+   }
 
-      additional_info$NB.disp.param <- NA
-   } else if(fitting_method == 'own') {
-      # Validate that fit_vals_own is provided and contains necessary components
-      if(is.list(fit_vals_own) ||
-          !all(c("X_on_Z_fit_vals", "Y_on_Z_fit_vals") %in% names(fit_vals_own))) {
-         stop("fit_vals_own must be a list containing 'X_on_Z_fit_vals' and 'Y_on_Z_fit_vals' when using fitting_method = 'own'")
-      }
 
-      # Extract pre-computed values from fit_vals_own
-      X_on_Z_fit_vals <- fit_vals_own$X_on_Z_fit_vals
-      Y_on_Z_fit_vals <- fit_vals_own$Y_on_Z_fit_vals
+   if(fitting_Y_on_Z == 'glm'){
+     # fit Y on Z regression when fitting method is glm
+     if(Y_on_Z_fam == "negative.binomial"){
+       aux_info_Y_on_Z <- nb_precomp(list(Y = Y, Z = Z))
 
-      additional_info$NB.disp.param <- NA
+       Y_on_Z_fit <- stats::glm(Y ~ Z,
+                                family = MASS::negative.binomial(aux_info_Y_on_Z$theta_hat),
+                                mustart = aux_info_Y_on_Z$fitted_values) |> suppressWarnings()
+       Y_on_Z_fit_vals <- Y_on_Z_fit$fitted.values
+
+       additional_info$NB.disp.param <- aux_info_Y_on_Z$theta_hat
+     } else{
+       Y_on_Z_fit <- suppressWarnings(stats::glm(Y ~ Z, family = Y_on_Z_fam))
+       Y_on_Z_fit_vals <- Y_on_Z_fit$fitted.values
+
+       additional_info$NB.disp.param <- NA
+     }
+   } else if(fitting_Y_on_Z %in% c('rf','prob_forest')){
+     # fit Y on Z regression when fitting method is random forest
+     if(Y_on_Z_fam == "binomial"){
+       p.forest.Y <- grf::probability_forest(X = as.matrix(Z), Y = as.factor(Y))
+       p.hat.Y <- stats::predict(p.forest.Y, as.matrix(Z), estimate.variance = F)
+
+       Y_on_Z_fit_vals <- p.hat.Y$predictions[ ,"1"]
+     }
+
+     additional_info$NB.disp.param <- NA
+   } else if(fitting_Y_on_Z == 'own') {
+     # Validate that fit_vals_Y_on_Z_own is provided and contains necessary components
+     if(is.numeric(fit_vals_Y_on_Z_own)) {
+       stop("fit_vals_Y_on_Z_own must be a vector containing 'Y_on_Z_fit_vals' when using fitting_Y_on_Z = 'own'")
+     }
+     # Extract pre-computed values from fit_vals_Y_on_Z_own
+     Y_on_Z_fit_vals <- fit_vals_Y_on_Z_own
+
+     additional_info$NB.disp.param <- NA
    }
 
    return(list(X_on_Z_fit_vals = X_on_Z_fit_vals,
