@@ -66,9 +66,9 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
   p.both <- 2 * stats::pnorm(abs(test_stat), lower.tail = FALSE)
 
   pval <- switch(alternative,
-                 left = list(p.left = p.left),
-                 right = list(p.right = p.right),
-                 both = list(p.both = p.both),
+                 left = c(p.left = p.left),
+                 right = c(p.right = p.right),
+                 both = c(p.both = p.both),
                  stop("Invalid value for \code{side}."))
 
   # return test statistic and GCM p-value
@@ -158,9 +158,9 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
   p.both <- 2 * min(c(p.left, p.right))
 
   pval <- switch(alternative,
-                 left = list(p.left = p.left),
-                 right = list(p.right = p.right),
-                 both = list(p.both = p.both),
+                 left = c(p.left = p.left),
+                 right = c(p.right = p.right),
+                 both = c(p.both = p.both),
                  stop("Invalid value for pval_sideness"))
 
   # return test statistic and dCRT p-value
@@ -235,9 +235,9 @@ spaCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
   p.both <- spa_result$p.both
 
   pval <- switch(alternative,
-                 left = list(p.left = p.left),
-                 right = list(p.right = p.right),
-                 both = list(p.both = p.both),
+                 left = c(p.left = p.left),
+                 right = c(p.right = p.right),
+                 both = c(p.both = p.both),
                  stop("Invalid value for pval_sideness"))
 
   # return test statistic and spaCRT p-value
