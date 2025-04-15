@@ -11,7 +11,13 @@
 #' @param Y_on_Z_fam The GLM family for the regression of Y on Z
 #' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).
 #' @param fitting_X_on_Z The fitting method for the regression X on Z.
+#' (values can be \code{glm}, \code{rf}, \code{prob_forest}, or \code{own})
 #' @param fitting_Y_on_Z The fitting method for the regression Y on Z.
+#' @param fit_vals_X_on_Z_own Vector of fitted values for X on Z in case the user's custom method.
+#' Works only if fitting_X_on_Z = 'own'
+#' @param fit_vals_Y_on_Z_own Vector of fitted values for Y on Z in case the user's custom method.
+#' Works only if fitting_Y_on_Z = 'own'
+#' @param side The
 #'
 #' @return A named list with fields \code{test_stat} and \code{left_side_p_value},
 #' \code{right_side_p_value}, \code{both_side_p_value}.
@@ -30,7 +36,9 @@
 #' @export
 GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
                 fitting_X_on_Z = 'glm',
-                fitting_Y_on_Z = 'glm') {
+                fitting_Y_on_Z = 'glm',
+                fit_vals_X_on_Z_own = NULL,
+                fit_vals_Y_on_Z_own = NULL) {
 
   # extract (X,Y,Z) from inputted data
   X <- data$X; Y <- data$Y; Z <- data$Z
@@ -40,7 +48,9 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
                             X_on_Z_fam = X_on_Z_fam,
                             Y_on_Z_fam = Y_on_Z_fam,
                             fitting_X_on_Z = fitting_X_on_Z,
-                            fitting_Y_on_Z = fitting_Y_on_Z)
+                            fitting_Y_on_Z = fitting_Y_on_Z,
+                            fit_vals_X_on_Z_own = fit_vals_X_on_Z_own,
+                            fit_vals_Y_on_Z_own = fit_vals_Y_on_Z_own) |> suppressWarnings()
 
   X_on_Z_fit_vals <- fitted_vals$X_on_Z_fit_vals
   Y_on_Z_fit_vals <- fitted_vals$Y_on_Z_fit_vals
@@ -50,6 +60,21 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
 
   # compute the test statistic
   test_stat <- 1/sqrt(n)*sum(prod_resids)/stats::sd(prod_resids) * sqrt(n/(n-1))
+
+  # Compute p-value based on sideness
+  p.left <- stats::pnorm(test_stat, lower.tail = TRUE)
+  p.right <- stats::pnorm(test_stat, lower.tail = FALSE)
+  p.both <- 2 * stats::pnorm(abs(test_stat), lower.tail = FALSE)
+
+  pval <- switch(side,
+                 left = list(p.left = p.left),
+                 right = list(p.right = p.right),
+                 both = list(p.both = p.both),
+                 # all = list(p.left = p.left, p.right = p.right, p.both = p.both),
+                 stop("Invalid value for \code{side}."))
+
+  # return test statistic and GCM p-value
+  return(c(list(test_stat = test_stat), p_value = pval))
 
   # return test statistic, GCM p-values, and related quantities
   return(list(test_stat = test_stat,
@@ -75,6 +100,10 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @param fitting_X_on_Z The fitting method for the regression X on Z.
 #' @param fitting_Y_on_Z The fitting method for the regression Y on Z.
+#' @param fit_vals_X_on_Z_own Vector of fitted values for X on Z in case the user's custom method.
+#' Works only if fitting_X_on_Z = 'own'
+#' @param fit_vals_Y_on_Z_own Vector of fitted values for Y on Z in case the user's custom method.
+#' Works only if fitting_Y_on_Z = 'own'
 #' @param B The number of resamples to draw.
 #'
 #' @return A named list with fields \code{test_stat}, \code{left_side_p_value},
@@ -87,15 +116,17 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
 #' X_on_Z_fam <- "binomial"
 #' Y_on_Z_fam <- "poisson"
-#' results <- dCRT(data, X_on_Z_fam, Y_on_Z_fam,
+#' (results <- dCRT(data, X_on_Z_fam, Y_on_Z_fam,
 #'                 fitting_X_on_Z = 'rf',
 #'                 fitting_Y_on_Z = 'glm',
-#'                 B = 2000)
+#'                 B = 2000))
 #'
 #' @export
 dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
                  fitting_X_on_Z = 'glm',
                  fitting_Y_on_Z = 'glm',
+                 fit_vals_X_on_Z_own = NULL,
+                 fit_vals_Y_on_Z_own = NULL,
                  B = 2000) {
 
   # extract (X,Y,Z) from inputted data
@@ -106,7 +137,9 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
                             X_on_Z_fam = X_on_Z_fam,
                             Y_on_Z_fam = Y_on_Z_fam,
                             fitting_X_on_Z = fitting_X_on_Z,
-                            fitting_Y_on_Z = fitting_Y_on_Z)
+                            fitting_Y_on_Z = fitting_Y_on_Z,
+                            fit_vals_X_on_Z_own = fit_vals_X_on_Z_own,
+                            fit_vals_Y_on_Z_own = fit_vals_Y_on_Z_own) |> suppressWarnings()
 
   X_on_Z_fit_vals <- fitted_vals$X_on_Z_fit_vals
   Y_on_Z_fit_vals <- fitted_vals$Y_on_Z_fit_vals
@@ -131,6 +164,17 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
   # compute p-values
   p.left <- 1/(B+1) * (1 + sum(prod_resid_resamp <= test_stat))
   p.right <- 1/(B+1) * (1 + sum(prod_resid_resamp >= test_stat))
+  p.both <- 2 * min(c(p.left, p.right))
+
+  pval <- switch(pval_sideness,
+                 left = list(p.left = p.left),
+                 right = list(p.right = p.right),
+                 both = list(p.both = p.both),
+                 all = list(p.left = p.left, p.right = p.right, p.both = p.both),
+                 stop("Invalid value for pval_sideness"))
+
+  # return test statistic and dCRT p-value
+  return(c(list(test_stat = test_stat), p_value = pval))
 
   # return test statistic, dCRT p-values, and related quantities
   return(list(test_stat = test_stat,
@@ -156,7 +200,10 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @param fitting_X_on_Z The fitting method for the regression X on Z.
 #' @param fitting_Y_on_Z The fitting method for the regression Y on Z.
-#' @param R Upper bound of search space for the saddlepoint
+#' @param fit_vals_X_on_Z_own Vector of fitted values for X on Z in case the user's custom method.
+#' Works only if fitting_X_on_Z = 'own'
+#' @param fit_vals_Y_on_Z_own Vector of fitted values for Y on Z in case the user's custom method.
+#' Works only if fitting_Y_on_Z = 'own'
 #'
 #' @return A named list with fields \code{test_stat}, \code{left_side_p_value},
 #' \code{right_side_p_value}, \code{both_side_p_value}, and
@@ -178,22 +225,40 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
 spaCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
                    fitting_X_on_Z = 'glm',
                    fitting_Y_on_Z = 'glm',
-                   R = 5) {
+                   fit_vals_X_on_Z_own = NULL,
+                   fit_vals_Y_on_Z_own = NULL) {
 
   fitted_vals <- fit_models(data = data,
                             X_on_Z_fam = X_on_Z_fam,
                             Y_on_Z_fam = Y_on_Z_fam,
                             fitting_X_on_Z = fitting_X_on_Z,
-                            fitting_Y_on_Z = fitting_Y_on_Z) |> suppressWarnings()
+                            fitting_Y_on_Z = fitting_Y_on_Z,
+                            fit_vals_X_on_Z_own = fit_vals_X_on_Z_own,
+                            fit_vals_Y_on_Z_own = fit_vals_Y_on_Z_own) |> suppressWarnings()
 
   spa_result <- spa_cdf(X = data$X, Y = data$Y,
                         X_on_Z_fit_vals = fitted_vals$X_on_Z_fit_vals,
                         Y_on_Z_fit_vals = fitted_vals$Y_on_Z_fit_vals,
                         fam = X_on_Z_fam,
-                        R = abs(R),
+                        R = 5,
                         max_expansions = 10) |> suppressWarnings()
 
   NB.disp.param <- fitted_vals$additional_info$NB.disp.param
+
+  # Compute p-value based on sideness
+  p.left <- spa_result$p.left
+  p.right <- spa_result$p.right
+  p.both <- spa_result$p.both
+
+  pval <- switch(pval_sideness,
+                 left = list(p.left = p.left),
+                 right = list(p.right = p.right),
+                 both = list(p.both = p.both),
+                 all = list(p.left = p.left, p.right = p.right, p.both = p.both),
+                 stop("Invalid value for pval_sideness"))
+
+  # return test statistic and spaCRT p-value
+  return(c(list(test_stat = test_stat), p_value = pval))
 
   return(spa_result |> append(list(NB.disp.param = NB.disp.param), after = 4))
 }
