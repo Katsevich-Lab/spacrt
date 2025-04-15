@@ -3,9 +3,8 @@
 #'
 #' \code{GCM} is a function carrying out the GCM test based on GLMs for `X|Z` and `Y|Z`.
 #'
-#' @param data A named list with fields \code{X} (an nx1 vector for the predictor
-#' variable of interest), \code{Y} (an nx1 response vector), and \code{Z}
-#' (an nxp matrix of covariates).
+#' @param data A (non-empty) named list with fields \code{X} (an nx1 vector for the predictor
+#' variable of interest), \code{Y} (an nx1 response vector), and \code{Z} (an nxp matrix of covariates).
 #' @param X_on_Z_fam The GLM family for the regression of X on Z
 #' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).
 #' @param Y_on_Z_fam The GLM family for the regression of Y on Z
@@ -17,7 +16,7 @@
 #' Works only if fitting_X_on_Z = 'own'
 #' @param fit_vals_Y_on_Z_own Vector of fitted values for Y on Z in case the user's custom method.
 #' Works only if fitting_Y_on_Z = 'own'
-#' @param side The
+#' @param alternative A character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less".
 #'
 #' @return A named list with fields \code{test_stat} and \code{left_side_p_value},
 #' \code{right_side_p_value}, \code{both_side_p_value}.
@@ -66,23 +65,14 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
   p.right <- stats::pnorm(test_stat, lower.tail = FALSE)
   p.both <- 2 * stats::pnorm(abs(test_stat), lower.tail = FALSE)
 
-  pval <- switch(side,
+  pval <- switch(alternative,
                  left = list(p.left = p.left),
                  right = list(p.right = p.right),
                  both = list(p.both = p.both),
-                 # all = list(p.left = p.left, p.right = p.right, p.both = p.both),
                  stop("Invalid value for \code{side}."))
 
   # return test statistic and GCM p-value
-  return(c(list(test_stat = test_stat), p_value = pval))
-
-  # return test statistic, GCM p-values, and related quantities
-  return(list(test_stat = test_stat,
-              p.left = stats::pnorm(test_stat, lower.tail = TRUE),
-              p.right = stats::pnorm(test_stat, lower.tail = FALSE),
-              p.both = 2*stats::pnorm(abs(test_stat), lower.tail = FALSE),
-              NB.disp.param = fitted_vals$additional_info$NB.disp.param,
-              unnormalized_test_stat = 1/sqrt(n)*sum(prod_resids)))
+  return(c(test_stat = test_stat, p_value = pval))
 }
 
 
@@ -104,6 +94,7 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #' Works only if fitting_X_on_Z = 'own'
 #' @param fit_vals_Y_on_Z_own Vector of fitted values for Y on Z in case the user's custom method.
 #' Works only if fitting_Y_on_Z = 'own'
+#' @param alternative A character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less".
 #' @param B The number of resamples to draw.
 #'
 #' @return A named list with fields \code{test_stat}, \code{left_side_p_value},
@@ -166,22 +157,14 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
   p.right <- 1/(B+1) * (1 + sum(prod_resid_resamp >= test_stat))
   p.both <- 2 * min(c(p.left, p.right))
 
-  pval <- switch(pval_sideness,
+  pval <- switch(alternative,
                  left = list(p.left = p.left),
                  right = list(p.right = p.right),
                  both = list(p.both = p.both),
-                 all = list(p.left = p.left, p.right = p.right, p.both = p.both),
                  stop("Invalid value for pval_sideness"))
 
   # return test statistic and dCRT p-value
-  return(c(list(test_stat = test_stat), p_value = pval))
-
-  # return test statistic, dCRT p-values, and related quantities
-  return(list(test_stat = test_stat,
-              p.left = p.left,
-              p.right = p.right,
-              p.both = 2*min(p.left, p.right),
-              NB.disp.param = fitted_vals$additional_info$NB.disp.param))
+  return(c(test_stat = test_stat, p_value = pval))
 }
 
 
@@ -204,6 +187,7 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #' Works only if fitting_X_on_Z = 'own'
 #' @param fit_vals_Y_on_Z_own Vector of fitted values for Y on Z in case the user's custom method.
 #' Works only if fitting_Y_on_Z = 'own'
+#' @param alternative A character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less".
 #'
 #' @return A named list with fields \code{test_stat}, \code{left_side_p_value},
 #' \code{right_side_p_value}, \code{both_side_p_value}, and
@@ -250,17 +234,14 @@ spaCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
   p.right <- spa_result$p.right
   p.both <- spa_result$p.both
 
-  pval <- switch(pval_sideness,
+  pval <- switch(alternative,
                  left = list(p.left = p.left),
                  right = list(p.right = p.right),
                  both = list(p.both = p.both),
-                 all = list(p.left = p.left, p.right = p.right, p.both = p.both),
                  stop("Invalid value for pval_sideness"))
 
   # return test statistic and spaCRT p-value
-  return(c(list(test_stat = test_stat), p_value = pval))
-
-  return(spa_result |> append(list(NB.disp.param = NB.disp.param), after = 4))
+  return(c(test_stat = test_stat, p_value = pval))
 }
 
 
