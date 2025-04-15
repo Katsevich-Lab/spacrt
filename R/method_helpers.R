@@ -25,7 +25,10 @@
 #'                  Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values,
 #'                  fam = "binomial", R = 1000)
 #' @noRd
-spa_cdf <- function(X, Y, X_on_Z_fit_vals, Y_on_Z_fit_vals, fam, R, max_expansions = 10){
+spa_cdf <- function(X, Y,
+                    X_on_Z_fit_vals,
+                    Y_on_Z_fit_vals,
+                    fam, R = 5, max_expansions = 10){
 
   P <- X_on_Z_fit_vals
   W <- Y - Y_on_Z_fit_vals
@@ -297,7 +300,7 @@ fit_models <- function(data,
       }
    } else if(fitting_X_on_Z == 'own') {
       # Validate that fit_vals_X_on_Z_own is provided and contains necessary components
-      if(is.numeric(fit_vals_X_on_Z_own)) {
+      if(!is.numeric(fit_vals_X_on_Z_own)) {
          stop("fit_vals_X_on_Z_own must be a vector containing 'X_on_Z_fit_vals' when using fitting_X_on_Z = 'own'")
       }
       # Extract pre-computed values from fit_vals_X_on_Z_own
@@ -334,9 +337,10 @@ fit_models <- function(data,
      additional_info$NB.disp.param <- NA
    } else if(fitting_Y_on_Z == 'own') {
      # Validate that fit_vals_Y_on_Z_own is provided and contains necessary components
-     if(is.numeric(fit_vals_Y_on_Z_own)) {
+     if(!is.numeric(fit_vals_Y_on_Z_own)) {
        stop("fit_vals_Y_on_Z_own must be a vector containing 'Y_on_Z_fit_vals' when using fitting_Y_on_Z = 'own'")
      }
+
      # Extract pre-computed values from fit_vals_Y_on_Z_own
      Y_on_Z_fit_vals <- fit_vals_Y_on_Z_own
 
