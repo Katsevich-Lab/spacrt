@@ -10,6 +10,9 @@ dCRT(
   Y_on_Z_fam,
   fitting_X_on_Z = "glm",
   fitting_Y_on_Z = "glm",
+  fit_vals_X_on_Z_own = NULL,
+  fit_vals_Y_on_Z_own = NULL,
+  alternative = "both",
   B = 2000
 )
 }
@@ -28,6 +31,14 @@ variable of interest), \code{Y} (an nx1 response vector), and \code{Z}
 
 \item{fitting_Y_on_Z}{The fitting method for the regression Y on Z.}
 
+\item{fit_vals_X_on_Z_own}{Vector of fitted values for X on Z in case the user's custom method.
+Works only if fitting_X_on_Z = 'own'}
+
+\item{fit_vals_Y_on_Z_own}{Vector of fitted values for Y on Z in case the user's custom method.
+Works only if fitting_Y_on_Z = 'own'}
+
+\item{alternative}{A character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less".}
+
 \item{B}{The number of resamples to draw.}
 }
 \value{
@@ -44,9 +55,9 @@ data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
 X_on_Z_fam <- "binomial"
 Y_on_Z_fam <- "poisson"
-results <- dCRT(data, X_on_Z_fam, Y_on_Z_fam,
+(results <- dCRT(data, X_on_Z_fam, Y_on_Z_fam,
                 fitting_X_on_Z = 'rf',
                 fitting_Y_on_Z = 'glm',
-                B = 2000)
+                B = 2000))
 
 }

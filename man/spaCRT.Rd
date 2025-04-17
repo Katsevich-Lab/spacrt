@@ -10,7 +10,9 @@ spaCRT(
   Y_on_Z_fam,
   fitting_X_on_Z = "glm",
   fitting_Y_on_Z = "glm",
-  R = 5
+  fit_vals_X_on_Z_own = NULL,
+  fit_vals_Y_on_Z_own = NULL,
+  alternative = "both"
 )
 }
 \arguments{
@@ -28,7 +30,13 @@ variable of interest), \code{Y} (an nx1 response vector), and \code{Z}
 
 \item{fitting_Y_on_Z}{The fitting method for the regression Y on Z.}
 
-\item{R}{Upper bound of search space for the saddlepoint}
+\item{fit_vals_X_on_Z_own}{Vector of fitted values for X on Z in case the user's custom method.
+Works only if fitting_X_on_Z = 'own'}
+
+\item{fit_vals_Y_on_Z_own}{Vector of fitted values for Y on Z in case the user's custom method.
+Works only if fitting_Y_on_Z = 'own'}
+
+\item{alternative}{A character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less".}
 }
 \value{
 A named list with fields \code{test_stat}, \code{left_side_p_value},
