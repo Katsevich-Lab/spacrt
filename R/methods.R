@@ -37,7 +37,8 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
                 fitting_X_on_Z = 'glm',
                 fitting_Y_on_Z = 'glm',
                 fit_vals_X_on_Z_own = NULL,
-                fit_vals_Y_on_Z_own = NULL) {
+                fit_vals_Y_on_Z_own = NULL,
+                alternative = 'both') {
 
   # extract (X,Y,Z) from inputted data
   X <- data$X; Y <- data$Y; Z <- data$Z
@@ -69,7 +70,7 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
                  left = c(p.left = p.left),
                  right = c(p.right = p.right),
                  both = c(p.both = p.both),
-                 stop("Invalid value for \code{side}."))
+                 stop("Invalid value for side."))
 
   # return test statistic and GCM p-value
   return(c(test_stat = test_stat, p_value = pval))
@@ -118,6 +119,7 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
                  fitting_Y_on_Z = 'glm',
                  fit_vals_X_on_Z_own = NULL,
                  fit_vals_Y_on_Z_own = NULL,
+                 alternative = 'both',
                  B = 2000) {
 
   # extract (X,Y,Z) from inputted data
@@ -210,7 +212,8 @@ spaCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
                    fitting_X_on_Z = 'glm',
                    fitting_Y_on_Z = 'glm',
                    fit_vals_X_on_Z_own = NULL,
-                   fit_vals_Y_on_Z_own = NULL) {
+                   fit_vals_Y_on_Z_own = NULL,
+                   alternative = 'both') {
 
   fitted_vals <- fit_models(data = data,
                             X_on_Z_fam = X_on_Z_fam,
@@ -241,7 +244,7 @@ spaCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
                  stop("Invalid value for pval_sideness"))
 
   # return test statistic and spaCRT p-value
-  return(c(test_stat = test_stat, p_value = pval))
+  return(c(test_stat = spa_result$test_data, p_value = pval))
 }
 
 
