@@ -8,7 +8,9 @@
 #' @param fam The GLM family which includes the distribution whose CGF is being
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @param R stats::uniroot() search space endpoint
-#' @param max_expansions Maximum number of times stats::uniroot() search space should be broadened
+#' @param max_expansions Maximum number of times stats::uniroot() search space should be broadened.
+#' @param gcm.backup A logical argument specifying whether GCM should be employed in case stats::uniroot() fails to solve the saddlepoint equation.
+#'
 #' @return \code{test statistic, left-sided p-value, right-sided p-value, both-sided p-value,} and \code{gcm.default}
 #' which specifies whether GCM was used as a backup.
 #'
@@ -28,7 +30,9 @@
 spa_cdf <- function(X, Y,
                     X_on_Z_fit_vals,
                     Y_on_Z_fit_vals,
-                    fam, R = 5, max_expansions = 10){
+                    fam,
+                    R = 5, max_expansions = 10,
+                    gcm.backup = TRUE){
 
   P <- X_on_Z_fit_vals
   W <- Y - Y_on_Z_fit_vals
@@ -85,7 +89,7 @@ spa_cdf <- function(X, Y,
                    p.right = 1 - p.left,
                    p.both = 2*min(c(p.left, 1 - p.left)),
                    gcm.default = FALSE)
-  }else{
+  }else if(gcm.backup == TRUE){
     test_stat <- sum(prod_resids)/(stats::sd(prod_resids) * sqrt(n-1))
 
     res <- list(test_stat = test_stat,
@@ -93,6 +97,8 @@ spa_cdf <- function(X, Y,
                 p.right = stats::pnorm(test_stat, lower.tail = FALSE),
                 p.both = 2*stats::pnorm(abs(test_stat), lower.tail = FALSE),
                 gcm.default = TRUE)
+  }else {
+    res <- NA
   }
 
   return(res)
