@@ -13,13 +13,12 @@
 #' (values can be \code{glm}, \code{rf}, \code{prob_forest}, or \code{own})
 #' @param fitting_Y_on_Z The fitting method for the regression Y on Z.
 #' @param fit_vals_X_on_Z_own Vector of fitted values for X on Z in case the user's custom method.
-#' Works only if fitting_X_on_Z = 'own'
+#' Works only if fitting_X_on_Z = 'own'.
 #' @param fit_vals_Y_on_Z_own Vector of fitted values for Y on Z in case the user's custom method.
-#' Works only if fitting_Y_on_Z = 'own'
+#' Works only if fitting_Y_on_Z = 'own'.
 #' @param alternative A character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less".
 #'
-#' @return A named list with fields \code{test_stat} and \code{left_side_p_value},
-#' \code{right_side_p_value}, \code{both_side_p_value}.
+#' @return A named list with fields \code{test_stat} and \code{p_value}.
 #'
 #' @examples
 #' n <- 20; p <- 2
@@ -38,7 +37,7 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
                 fitting_Y_on_Z = 'glm',
                 fit_vals_X_on_Z_own = NULL,
                 fit_vals_Y_on_Z_own = NULL,
-                alternative = 'both') {
+                alternative = 'two.sided') {
 
   # extract (X,Y,Z) from inputted data
   X <- data$X; Y <- data$Y; Z <- data$Z
@@ -73,7 +72,8 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
                  stop("Invalid value for side."))
 
   # return test statistic and GCM p-value
-  return(c(test_stat = test_stat, p_value = pval))
+  return(list(test_stat = test_stat,
+              p_value = pval))
 }
 
 
@@ -83,8 +83,7 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #' \code{dCRT} is a function carrying out the dCRT based on GLMs for `X|Z` and `Y|Z`.
 #'
 #' @param data A named list with fields \code{X} (an nx1 vector for the predictor
-#' variable of interest), \code{Y} (an nx1 response vector), and \code{Z}
-#' (an nxp matrix of covariates).
+#' variable of interest), \code{Y} (an nx1 response vector), and \code{Z} (an nxp matrix of covariates).
 #' @param X_on_Z_fam The GLM family for the regression of X on Z
 #' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @param Y_on_Z_fam The GLM family for the regression of Y on Z
@@ -92,14 +91,13 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #' @param fitting_X_on_Z The fitting method for the regression X on Z.
 #' @param fitting_Y_on_Z The fitting method for the regression Y on Z.
 #' @param fit_vals_X_on_Z_own Vector of fitted values for X on Z in case the user's custom method.
-#' Works only if fitting_X_on_Z = 'own'
+#' Works only if fitting_X_on_Z = 'own'.
 #' @param fit_vals_Y_on_Z_own Vector of fitted values for Y on Z in case the user's custom method.
-#' Works only if fitting_Y_on_Z = 'own'
+#' Works only if fitting_Y_on_Z = 'own'.
 #' @param alternative A character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less".
-#' @param B The number of resamples to draw.
+#' @param B The number of resamples to draw (Default value is 2000).
 #'
-#' @return A named list with fields \code{test_stat}, \code{left_side_p_value},
-#' \code{right_side_p_value}, and \code{both_side_p_value}.
+#' @return A named list with fields \code{test_stat} and \code{p_value}.
 #'
 #' @examples
 #' n <- 80; p <- 2; B <- 100
@@ -119,7 +117,7 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
                  fitting_Y_on_Z = 'glm',
                  fit_vals_X_on_Z_own = NULL,
                  fit_vals_Y_on_Z_own = NULL,
-                 alternative = 'both',
+                 alternative = 'two.sided',
                  B = 2000) {
 
   # extract (X,Y,Z) from inputted data
@@ -166,7 +164,8 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
                  stop("Invalid value for pval_sideness"))
 
   # return test statistic and dCRT p-value
-  return(c(test_stat = test_stat, p_value = pval))
+  return(list(test_stat = test_stat,
+              p_value = pval))
 }
 
 
@@ -190,11 +189,10 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #' @param fit_vals_Y_on_Z_own Vector of fitted values for Y on Z in case the user's custom method.
 #' Works only if fitting_Y_on_Z = 'own'
 #' @param alternative A character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less".
+#' @param gcm.backup A logical argument specifying whether GCM should be employed in case spaCRT fails to solve the saddlepoint equation.
 #'
-#' @return A named list with fields \code{test_stat}, \code{left_side_p_value},
-#' \code{right_side_p_value}, \code{both_side_p_value}, and
-#' \code{gcm.default}.
-#' gcm.default returns TRUE if GCM was employed due to the failure of spaCRT.
+#' @return A named list with fields \code{test_stat}, \code{p_value}, and \code{gcm.employed}.
+#' \code{backup.gcm} returns TRUE if GCM was employed due to the failure of spaCRT.
 #'
 #' @examples
 #' n <- 50; p <- 4
@@ -213,7 +211,8 @@ spaCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
                    fitting_Y_on_Z = 'glm',
                    fit_vals_X_on_Z_own = NULL,
                    fit_vals_Y_on_Z_own = NULL,
-                   alternative = 'both') {
+                   alternative = 'two.sided',
+                   gcm.backup = TRUE) {
 
   fitted_vals <- fit_models(data = data,
                             X_on_Z_fam = X_on_Z_fam,
@@ -227,24 +226,35 @@ spaCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
                         X_on_Z_fit_vals = fitted_vals$X_on_Z_fit_vals,
                         Y_on_Z_fit_vals = fitted_vals$Y_on_Z_fit_vals,
                         fam = X_on_Z_fam,
-                        R = 5,
-                        max_expansions = 10) |> suppressWarnings()
+                        R = 5, max_expansions = 10,
+                        gcm.backup = gcm.backup) |> suppressWarnings()
 
   NB.disp.param <- fitted_vals$additional_info$NB.disp.param
 
-  # Compute p-value based on sideness
-  p.left <- spa_result$p.left
-  p.right <- spa_result$p.right
-  p.both <- spa_result$p.both
+  if(!is.na(spa_result)){
+    # Compute p-value based on sideness
+    p.left <- spa_result$p.left
+    p.right <- spa_result$p.right
+    p.both <- spa_result$p.both
 
-  pval <- switch(alternative,
-                 left = c(p.left = p.left),
-                 right = c(p.right = p.right),
-                 both = c(p.both = p.both),
-                 stop("Invalid value for pval_sideness"))
+    pval <- switch(alternative,
+                   left = c(p.left = p.left),
+                   right = c(p.right = p.right),
+                   both = c(p.both = p.both),
+                   stop("Invalid value for pval_sideness"))
+  }else {
+    warning(paste0("The saddlepoint equation could not be solved, and GCM was not employed as a backup.",
+                   "\nPlease consider using gcm.backup = TRUE."))
+
+    return(list(test_stat = NA,
+                p_value = NA,
+                gcm.employed = gcm.backup))
+  }
 
   # return test statistic and spaCRT p-value
-  return(c(test_stat = spa_result$test_data, p_value = pval))
+  return(list(test_stat = spa_result$test_data,
+              p_value = pval,
+              gcm.employed = spa_result$gcm.default))
 }
 
 
