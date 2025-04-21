@@ -12,7 +12,7 @@ GCM(
   fitting_Y_on_Z = "glm",
   fit_vals_X_on_Z_own = NULL,
   fit_vals_Y_on_Z_own = NULL,
-  alternative = "both"
+  alternative = "two.sided"
 )
 }
 \arguments{
@@ -26,21 +26,23 @@ variable of interest), \code{Y} (an nx1 response vector), and \code{Z} (an nxp m
 (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).}
 
 \item{fitting_X_on_Z}{The fitting method for the regression X on Z.
-(values can be \code{glm}, \code{rf}, \code{prob_forest}, or \code{own})}
+(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own})}
 
-\item{fitting_Y_on_Z}{The fitting method for the regression Y on Z.}
+\item{fitting_Y_on_Z}{The fitting method for the regression Y on Z.
+(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own})}
 
 \item{fit_vals_X_on_Z_own}{Vector of fitted values for X on Z in case the user's custom method.
-Works only if fitting_X_on_Z = 'own'}
+Works only if fitting_X_on_Z = 'own'.}
 
 \item{fit_vals_Y_on_Z_own}{Vector of fitted values for Y on Z in case the user's custom method.
-Works only if fitting_Y_on_Z = 'own'}
+Works only if fitting_Y_on_Z = 'own'.}
 
-\item{alternative}{A character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less".}
+\item{alternative}{A character string specifying the alternative hypothesis
+(values can be "two.sided" (default), "greater", or "less"; meant for both-sided, right-sided,
+and left-sided p-values, respectively).}
 }
 \value{
-A named list with fields \code{test_stat} and \code{left_side_p_value},
-\code{right_side_p_value}, \code{both_side_p_value}.
+A named list with fields \code{test_stat} and \code{p_value}.
 }
 \description{
 \code{GCM} is a function carrying out the GCM test based on GLMs for \code{X|Z} and \code{Y|Z}.
@@ -52,8 +54,8 @@ data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
 X_on_Z_fam <- "binomial"
 Y_on_Z_fam <- "poisson"
-results <- GCM(data, X_on_Z_fam, Y_on_Z_fam,
-               fitting_X_on_Z = 'rf',
-               fitting_Y_on_Z = 'glm')
+GCM(data, X_on_Z_fam, Y_on_Z_fam,
+    fitting_X_on_Z = 'rf',
+    fitting_Y_on_Z = 'glm')
 
 }

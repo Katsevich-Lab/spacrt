@@ -12,37 +12,38 @@ spaCRT(
   fitting_Y_on_Z = "glm",
   fit_vals_X_on_Z_own = NULL,
   fit_vals_Y_on_Z_own = NULL,
-  alternative = "both"
+  alternative = "two.sided"
 )
 }
 \arguments{
-\item{data}{A named list with fields \code{X} (an nx1 vector for the predictor
-variable of interest), \code{Y} (an nx1 response vector), and \code{Z}
-(an nxp matrix of covariates).}
+\item{data}{A (non-empty) named list with fields \code{X} (an nx1 vector for the predictor
+variable of interest), \code{Y} (an nx1 response vector), and \code{Z} (an nxp matrix of covariates).}
 
 \item{X_on_Z_fam}{The GLM family for the regression of X on Z
-(values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).}
+(values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).}
 
 \item{Y_on_Z_fam}{The GLM family for the regression of Y on Z
-(values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).}
+(values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).}
 
-\item{fitting_X_on_Z}{The fitting method for the regression X on Z.}
+\item{fitting_X_on_Z}{The fitting method for the regression X on Z.
+(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own})}
 
-\item{fitting_Y_on_Z}{The fitting method for the regression Y on Z.}
+\item{fitting_Y_on_Z}{The fitting method for the regression Y on Z.
+(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own})}
 
 \item{fit_vals_X_on_Z_own}{Vector of fitted values for X on Z in case the user's custom method.
-Works only if fitting_X_on_Z = 'own'}
+Works only if fitting_X_on_Z = 'own'.}
 
 \item{fit_vals_Y_on_Z_own}{Vector of fitted values for Y on Z in case the user's custom method.
-Works only if fitting_Y_on_Z = 'own'}
+Works only if fitting_Y_on_Z = 'own'.}
 
-\item{alternative}{A character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less".}
+\item{alternative}{A character string specifying the alternative hypothesis
+(values can be "two.sided" (default), "greater", or "less"; meant for both-sided, right-sided,
+and left-sided p-values, respectively).}
 }
 \value{
-A named list with fields \code{test_stat}, \code{left_side_p_value},
-\code{right_side_p_value}, \code{both_side_p_value}, and
-\code{gcm.default}.
-gcm.default returns TRUE if GCM was employed due to the failure of spaCRT.
+A named list with fields \code{test_stat}, \code{p_value}, and \code{gcm.employed}.
+\code{spa.success} returns TRUE if the backup method was employed due to the failure of spaCRT.
 }
 \description{
 \code{spaCRT} is a function carrying out the saddlepoint approximation to the
@@ -53,10 +54,28 @@ n <- 50; p <- 4
 data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
              Y = rbinom(n = n, size = 1, prob = 0.7),
              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
-X_on_Z_fam <- "binomial"
+X_on_Z_fam <- "poisson"
 Y_on_Z_fam <- "binomial"
 spaCRT(data, X_on_Z_fam, Y_on_Z_fam,
+       fitting_X_on_Z = 'glm',
+       fitting_Y_on_Z = 'glm',
+       alternative = 'greater')
+
+n <- 100; p <- 10
+data <- list(X = rbinom(n = n, size = 1, prob = 0.3),
+             Y = rpois(n = n, lambda = 1),
+             Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
+X_on_Z_fam <- "binomial"
+Y_on_Z_fam <- "poisson"
+
+pois_obj <- function(b) sum(exp(data$Z \%*\% b) - data$Y * (data$Z \%*\% b))
+M <- matrix(0, nrow = ncol(data$Z), ncol = 1)
+beta_hat <- stats::optim(M, pois_obj, method = "BFGS")$par
+fit_vals_Y_on_Z_own <- as.numeric(exp(data$Z \%*\% beta_hat))
+
+spaCRT(data, X_on_Z_fam, Y_on_Z_fam,
        fitting_X_on_Z = 'rf',
-       fitting_Y_on_Z = 'glm')
+       fitting_Y_on_Z = 'own',
+       fit_vals_Y_on_Z_own = fit_vals_Y_on_Z_own)
 
 }
