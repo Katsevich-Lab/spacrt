@@ -9,10 +9,10 @@
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @param R stats::uniroot() search space endpoint
 #' @param max_expansions Maximum number of times stats::uniroot() search space should be broadened.
-#' @param gcm.backup A logical argument specifying whether GCM should be employed in case stats::uniroot() fails to solve the saddlepoint equation.
 #'
-#' @return \code{test statistic, left-sided p-value, right-sided p-value, both-sided p-value,} and \code{gcm.default}
-#' which specifies whether GCM was used as a backup.
+#' @return \code{test statistic}, \code{left-sided p-value}, \code{right-sided p-value}, \code{both-sided p-value}, and \code{spa.success}
+#' which specifies whether the saddlepoint equation could be solved. If not, a backup method (GCM) had to be employed
+#' as a backup.
 #'
 #' @examples
 #' n <- 100; p <- 2; normalize <- FALSE; return_cdf <- FALSE
@@ -31,8 +31,7 @@ spa_cdf <- function(X, Y,
                     X_on_Z_fit_vals,
                     Y_on_Z_fit_vals,
                     fam,
-                    R = 5, max_expansions = 10,
-                    gcm.backup = TRUE){
+                    R = 5, max_expansions = 10){
 
   P <- X_on_Z_fit_vals
   W <- Y - Y_on_Z_fit_vals
@@ -88,17 +87,15 @@ spa_cdf <- function(X, Y,
                    p.left = p.left,
                    p.right = 1 - p.left,
                    p.both = 2*min(c(p.left, 1 - p.left)),
-                   gcm.default = FALSE)
-  }else if(gcm.backup == TRUE){
+                   spa.success = TRUE)
+  }else {
     test_stat <- sum(prod_resids)/(stats::sd(prod_resids) * sqrt(n-1))
 
     res <- list(test_stat = test_stat,
                 p.left = stats::pnorm(test_stat, lower.tail = TRUE),
                 p.right = stats::pnorm(test_stat, lower.tail = FALSE),
                 p.both = 2*stats::pnorm(abs(test_stat), lower.tail = FALSE),
-                gcm.default = TRUE)
-  }else {
-    res <- NA
+                spa.success = FALSE)
   }
 
   return(res)
@@ -140,6 +137,7 @@ dCRT_dist <- function(n, fitted.val, fam){
 #' @param W A vector containing the weights.
 #' @param fam The GLM family which includes the distribution whose CGF is being
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
+#'
 #' @return CGF of the weighted distribution evaluated at \code{s}.
 #' @keywords internal
 wcgf <- function(s, P, W, fam){
@@ -156,14 +154,11 @@ wcgf <- function(s, P, W, fam){
 
 
 #####################################################################################
-#' \code{d1_wcgf} is a function computing the derivative of the cumulant generating
-#' function (CGF) of distributions, multiplied by a weight function, from GLM family
+#' \code{d1_wcgf} is a function computing the derivative of the weighted cumulant
+#' generating function (WCGF) of distributions from GLM family
 #'
-#' @param s The point where the CGF will be computed.
-#' @param P A vector containing the parameter values of the family of distributions.
-#' @param W A vector containing the weights.
-#' @param fam The GLM family which includes the distribution whose CGF is being
-#' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
+#' @inheritParams wcgf
+#'
 #' @return CGF of the weighted distribution evaluated at \code{s}.
 #' @keywords internal
 d1_wcgf <- function(s, P, W, fam){
@@ -181,14 +176,11 @@ d1_wcgf <- function(s, P, W, fam){
 
 
 ####################################################################################
-#' \code{d2_wcgf} is a function computing the hessian of the cumulant generating
-#' function (CGF) of distributions, multiplied by a weight function, from GLM family
+#' \code{d2_wcgf} is a function computing the hessian of the weighted cumulant
+#' generating function (WCGF) of distributions from GLM family
 #'
-#' @param s The point where the CGF will be computed.
-#' @param P A vector containing the parameter values of the family of distributions.
-#' @param W A vector containing the weights.
-#' @param fam The GLM family which includes the distribution whose CGF is being
-#' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
+#' @inheritParams wcgf
+#'
 #' @return CGF of the weighted distribution evaluated at \code{s}.
 #' @keywords internal
 d2_wcgf <- function(s, P, W, fam){
@@ -239,6 +231,7 @@ d2_wcgf <- function(s, P, W, fam){
 #' \code{nb_precomp} is a function computing the dispersion parameter in negative binomial regression
 #'
 #' @param data A list containing the response Y and covariate Z
+#'
 #' @return a list containing the Poisson model fitted values and estimate for dispersion
 #' @keywords internal
 nb_precomp <- function(data){
@@ -267,17 +260,8 @@ nb_precomp <- function(data){
 #' \code{fit_models} is a function carrying out the saddlepoint approximation to the
 #' dCRT based on GLMs for `X|Z` and `Y|Z`.
 #'
-#' @param data A named list with fields \code{X} (an nx1 vector for the predictor
-#' variable of interest), \code{Y} (an nx1 response vector), and \code{Z}
-#' (an nxp matrix of covariates).
-#' @param X_on_Z_fam The GLM family for the regression of X on Z
-#' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
-#' @param Y_on_Z_fam The GLM family for the regression of Y on Z
-#' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
-#' @param fitting_X_on_Z The fitting method for the regression X on Z.
-#' @param fitting_Y_on_Z The fitting method for the regression Y on Z.
-#' @param fit_vals_X_on_Z_own Fitted values of X_on_Z based on user's own method.
-#' @param fit_vals_Y_on_Z_own Fitted values of Y_on_Z based on user's own method.
+#' @inheritParams GCM
+#'
 #' @return Fitted values.
 #'
 #' @keywords internal
