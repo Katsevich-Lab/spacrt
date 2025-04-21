@@ -2,8 +2,8 @@
 % Please edit documentation in R/method_helpers.R
 \name{d1_wcgf}
 \alias{d1_wcgf}
-\title{\code{d1_wcgf} is a function computing the derivative of the cumulant generating
-function (CGF) of distributions, multiplied by a weight function, from GLM family}
+\title{\code{d1_wcgf} is a function computing the derivative of the weighted cumulant
+generating function (WCGF) of distributions from GLM family}
 \usage{
 d1_wcgf(s, P, W, fam)
 }
@@ -21,7 +21,7 @@ evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 CGF of the weighted distribution evaluated at \code{s}.
 }
 \description{
-\code{d1_wcgf} is a function computing the derivative of the cumulant generating
-function (CGF) of distributions, multiplied by a weight function, from GLM family
+\code{d1_wcgf} is a function computing the derivative of the weighted cumulant
+generating function (WCGF) of distributions from GLM family
 }
 \keyword{internal}

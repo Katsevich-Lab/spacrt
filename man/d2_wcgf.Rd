@@ -2,8 +2,8 @@
 % Please edit documentation in R/method_helpers.R
 \name{d2_wcgf}
 \alias{d2_wcgf}
-\title{\code{d2_wcgf} is a function computing the hessian of the cumulant generating
-function (CGF) of distributions, multiplied by a weight function, from GLM family}
+\title{\code{d2_wcgf} is a function computing the hessian of the weighted cumulant
+generating function (WCGF) of distributions from GLM family}
 \usage{
 d2_wcgf(s, P, W, fam)
 }
@@ -21,7 +21,7 @@ evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 CGF of the weighted distribution evaluated at \code{s}.
 }
 \description{
-\code{d2_wcgf} is a function computing the hessian of the cumulant generating
-function (CGF) of distributions, multiplied by a weight function, from GLM family
+\code{d2_wcgf} is a function computing the hessian of the weighted cumulant
+generating function (WCGF) of distributions from GLM family
 }
 \keyword{internal}
