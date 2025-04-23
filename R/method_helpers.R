@@ -26,7 +26,7 @@
 #'                  X_on_Z_fit_vals = X_on_Z_fit$fitted.values,
 #'                  Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values,
 #'                  fam = "binomial", R = 1000)
-#' @noRd
+#' @keywords internal
 spa_cdf <- function(X, Y,
                     X_on_Z_fit_vals,
                     Y_on_Z_fit_vals,
@@ -263,7 +263,6 @@ nb_precomp <- function(data){
 #' @inheritParams GCM
 #'
 #' @return Fitted values.
-#'
 #' @keywords internal
 fit_models <- function(data,
                        X_on_Z_fam, Y_on_Z_fam,
