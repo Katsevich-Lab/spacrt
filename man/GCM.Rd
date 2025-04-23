@@ -25,11 +25,11 @@ variable of interest), \code{Y} (an nx1 response vector), and \code{Z} (an nxp m
 \item{Y_on_Z_fam}{The GLM family for the regression of Y on Z
 (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).}
 
-\item{fitting_X_on_Z}{The fitting method for the regression X on Z.
-(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own})}
+\item{fitting_X_on_Z}{The fitting method for the regression X on Z
+(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).}
 
-\item{fitting_Y_on_Z}{The fitting method for the regression Y on Z.
-(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own})}
+\item{fitting_Y_on_Z}{The fitting method for the regression Y on Z
+(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).}
 
 \item{fit_vals_X_on_Z_own}{Vector of fitted values for X on Z in case the user's custom method.
 Works only if fitting_X_on_Z = 'own'.}

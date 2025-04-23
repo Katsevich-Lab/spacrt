@@ -25,11 +25,11 @@ variable of interest), \code{Y} (an nx1 response vector), and \code{Z} (an nxp m
 \item{Y_on_Z_fam}{The GLM family for the regression of Y on Z
 (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).}
 
-\item{fitting_X_on_Z}{The fitting method for the regression X on Z.
-(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own})}
+\item{fitting_X_on_Z}{The fitting method for the regression X on Z
+(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).}
 
-\item{fitting_Y_on_Z}{The fitting method for the regression Y on Z.
-(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own})}
+\item{fitting_Y_on_Z}{The fitting method for the regression Y on Z
+(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).}
 
 \item{fit_vals_X_on_Z_own}{Vector of fitted values for X on Z in case the user's custom method.
 Works only if fitting_X_on_Z = 'own'.}
@@ -42,8 +42,9 @@ Works only if fitting_Y_on_Z = 'own'.}
 and left-sided p-values, respectively).}
 }
 \value{
-A named list with fields \code{test_stat}, \code{p_value}, and \code{gcm.employed}.
-\code{spa.success} returns TRUE if the backup method was employed due to the failure of spaCRT.
+A named list with fields \code{test_stat}, \code{p_value}, and \code{spa.success}.
+\code{spa.success} returns TRUE if the saddlepoint equation could be solved; otherwise,
+the backup method (GCM) was employed due to the failure of spaCRT.
 }
 \description{
 \code{spaCRT} is a function carrying out the saddlepoint approximation to the

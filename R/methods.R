@@ -9,10 +9,10 @@
 #' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).
 #' @param Y_on_Z_fam The GLM family for the regression of Y on Z
 #' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).
-#' @param fitting_X_on_Z The fitting method for the regression X on Z.
-#' (values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own})
-#' @param fitting_Y_on_Z The fitting method for the regression Y on Z.
-#' (values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own})
+#' @param fitting_X_on_Z The fitting method for the regression X on Z
+#' (values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).
+#' @param fitting_Y_on_Z The fitting method for the regression Y on Z
+#' (values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).
 #' @param fit_vals_X_on_Z_own Vector of fitted values for X on Z in case the user's custom method.
 #' Works only if fitting_X_on_Z = 'own'.
 #' @param fit_vals_Y_on_Z_own Vector of fitted values for Y on Z in case the user's custom method.
