@@ -171,7 +171,7 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #'
 #' @return A named list with fields \code{test_stat}, \code{p_value}, and \code{spa.success}.
 #' \code{spa.success} returns TRUE if the saddlepoint equation could be solved; otherwise,
-#' the backup method (GCM) was employed.
+#' the backup method (GCM) was employed due to the failure of spaCRT.
 #'
 #' @examples
 #' n <- 50; p <- 4
