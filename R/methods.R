@@ -174,33 +174,37 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #' the backup method (GCM) was employed due to the failure of spaCRT.
 #'
 #' @examples
+#' ## Example 1
 #' n <- 50; p <- 4
 #' data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
-#'              Y = rbinom(n = n, size = 1, prob = 0.7),
-#'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
-#' X_on_Z_fam <- "poisson"
-#' Y_on_Z_fam <- "binomial"
-#' spaCRT(data, X_on_Z_fam, Y_on_Z_fam,
-#'        fitting_X_on_Z = 'glm',
-#'        fitting_Y_on_Z = 'glm',
-#'        alternative = 'greater')
-#'
-#' n <- 100; p <- 10
-#' data <- list(X = rbinom(n = n, size = 1, prob = 0.3),
 #'              Y = rpois(n = n, lambda = 1),
 #'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
 #' X_on_Z_fam <- "binomial"
 #' Y_on_Z_fam <- "poisson"
 #'
-#' pois_obj <- function(b) sum(exp(data$Z %*% b) - data$Y * (data$Z %*% b))
-#' M <- matrix(0, nrow = ncol(data$Z), ncol = 1)
-#' beta_hat <- stats::optim(M, pois_obj, method = "BFGS")$par
-#' fit_vals_Y_on_Z_own <- as.numeric(exp(data$Z %*% beta_hat))
-#'
 #' spaCRT(data, X_on_Z_fam, Y_on_Z_fam,
 #'        fitting_X_on_Z = 'rf',
+#'        fitting_Y_on_Z = 'glm',
+#'        alternative = 'greater')
+#'
+#' ## Example 2
+#' n <- 100; p <- 10
+#' data <- list(X = rbinom(n = n, size = 1, prob = 0.7),
+#'              Y = rbinom(n = n, size = 1, prob = 0.2),
+#'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
+#' X_on_Z_fam <- "binomial"
+#' Y_on_Z_fam <- "binomial"
+#'
+#' dtrain <- xgboost::xgb.DMatrix(data = data$Z, label = data$Y)
+#' model <- xgboost::xgboost(data = dtrain,
+#'                           objective = "binary:logistic",
+#'                           nrounds = 50, verbose = 0)
+#' predicted <- stats::predict(model, newdata = data$Z)
+#'
+#' spaCRT(data, X_on_Z_fam, Y_on_Z_fam,
+#'        fitting_X_on_Z = 'glm',
 #'        fitting_Y_on_Z = 'own',
-#'        fit_vals_Y_on_Z_own = fit_vals_Y_on_Z_own)
+#'        fit_vals_Y_on_Z_own = predicted)
 #'
 #' @export
 spaCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
