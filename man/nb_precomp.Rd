@@ -2,7 +2,8 @@
 % Please edit documentation in R/method_helpers.R
 \name{nb_precomp}
 \alias{nb_precomp}
-\title{\code{nb_precomp} is a function computing the dispersion parameter in negative binomial regression}
+\title{\code{nb_precomp} is a function computing the dispersion parameter in negative
+binomial regression}
 \usage{
 nb_precomp(data)
 }
@@ -13,6 +14,7 @@ nb_precomp(data)
 a list containing the Poisson model fitted values and estimate for dispersion
 }
 \description{
-\code{nb_precomp} is a function computing the dispersion parameter in negative binomial regression
+\code{nb_precomp} is a function computing the dispersion parameter in negative
+binomial regression
 }
 \keyword{internal}

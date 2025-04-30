@@ -18,7 +18,7 @@ d1_wcgf(s, P, W, fam)
 evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).}
 }
 \value{
-CGF of the weighted distribution evaluated at \code{s}.
+First derivative of CGF of the weighted distribution evaluated at \code{s}.
 }
 \description{
 \code{d1_wcgf} is a function computing the derivative of the weighted cumulant

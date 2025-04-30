@@ -18,7 +18,7 @@ d2_wcgf(s, P, W, fam)
 evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).}
 }
 \value{
-CGF of the weighted distribution evaluated at \code{s}.
+Second derivative of CGF of the weighted distribution evaluated at \code{s}.
 }
 \description{
 \code{d2_wcgf} is a function computing the hessian of the weighted cumulant

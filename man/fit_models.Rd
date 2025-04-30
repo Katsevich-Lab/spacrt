@@ -2,7 +2,7 @@
 % Please edit documentation in R/method_helpers.R
 \name{fit_models}
 \alias{fit_models}
-\title{Fit models to data}
+\title{\code{fit_models} is a function carrying out the regressions \code{X} on \code{Z} and \code{Y} on \code{Z}.}
 \usage{
 fit_models(
   data,
@@ -37,10 +37,9 @@ Works only if fitting_X_on_Z = 'own'.}
 Works only if fitting_Y_on_Z = 'own'.}
 }
 \value{
-Fitted values.
+A named list of fitted values of X|Z and Y|Z.
 }
 \description{
-\code{fit_models} is a function carrying out the saddlepoint approximation to the
-dCRT based on GLMs for \code{X|Z} and \code{Y|Z}.
+\code{fit_models} is a function carrying out the regressions \code{X} on \code{Z} and \code{Y} on \code{Z}.
 }
 \keyword{internal}

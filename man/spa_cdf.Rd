@@ -28,12 +28,13 @@ evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 
 \item{R}{stats::uniroot() search space endpoint}
 
-\item{max_expansions}{Maximum number of times stats::uniroot() search space should be broadened.}
+\item{max_expansions}{Maximum number of times stats::uniroot() search space
+should be broadened.}
 }
 \value{
-\code{test statistic}, \code{left-sided p-value}, \code{right-sided p-value}, \code{both-sided p-value}, and \code{spa.success}
-which specifies whether the saddlepoint equation could be solved. If not, a backup method (GCM) had to be employed
-as a backup.
+\code{test statistic}, \code{left-sided p-value}, \code{right-sided p-value},
+\code{both-sided p-value}, and \code{spa.success} which specifies whether the saddlepoint
+equation could be solved. If not, a backup method (GCM) had to be employed as a backup.
 }
 \description{
 \code{spa_cdf} SPA to CDF of T_n = S_n / sqrt(n)
