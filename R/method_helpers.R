@@ -1,4 +1,4 @@
-#####################################################################################
+############################################################################################
 #' \code{spa_cdf} SPA to CDF of T_n = S_n / sqrt(n)
 #'
 #' @param X The point where the CGF will be computed.
@@ -8,11 +8,12 @@
 #' @param fam The GLM family which includes the distribution whose CGF is being
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @param R stats::uniroot() search space endpoint
-#' @param max_expansions Maximum number of times stats::uniroot() search space should be broadened.
+#' @param max_expansions Maximum number of times stats::uniroot() search space
+#' should be broadened.
 #'
-#' @return \code{test statistic}, \code{left-sided p-value}, \code{right-sided p-value}, \code{both-sided p-value}, and \code{spa.success}
-#' which specifies whether the saddlepoint equation could be solved. If not, a backup method (GCM) had to be employed
-#' as a backup.
+#' @return \code{test statistic}, \code{left-sided p-value}, \code{right-sided p-value},
+#' \code{both-sided p-value}, and \code{spa.success} which specifies whether the saddlepoint
+#' equation could be solved. If not, a backup method (GCM) had to be employed as a backup.
 #'
 #' @examples
 #' n <- 100; p <- 2; normalize <- FALSE; return_cdf <- FALSE
@@ -103,7 +104,7 @@ spa_cdf <- function(X, Y,
 
 
 
-#####################################################################################
+############################################################################################
 #' \code{dCRT_dist} is a function that returns simulated data from an appropriate
 #' distribution depending on a specified  GLM family
 #'
@@ -112,8 +113,8 @@ spa_cdf <- function(X, Y,
 #' fitting a GLM to X on Z.
 #' @param fam The GLM family which includes the distribution whose CGF is being
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
-#' @return Simulated data from an appropriate distribution.
 #'
+#' @return Simulated data from an appropriate distribution.
 #' @keywords internal
 dCRT_dist <- function(n, fitted.val, fam){
 
@@ -128,7 +129,7 @@ dCRT_dist <- function(n, fitted.val, fam){
 }
 
 
-#####################################################################################
+############################################################################################
 #' \code{wcgf} is a function computing the cumulant generating function (CGF) of
 #' distributions, multiplied by a weight function, from the GLM family
 #'
@@ -153,13 +154,13 @@ wcgf <- function(s, P, W, fam){
 }
 
 
-#####################################################################################
+############################################################################################
 #' \code{d1_wcgf} is a function computing the derivative of the weighted cumulant
 #' generating function (WCGF) of distributions from GLM family
 #'
 #' @inheritParams wcgf
 #'
-#' @return CGF of the weighted distribution evaluated at \code{s}.
+#' @return First derivative of CGF of the weighted distribution evaluated at \code{s}.
 #' @keywords internal
 d1_wcgf <- function(s, P, W, fam){
 
@@ -175,13 +176,13 @@ d1_wcgf <- function(s, P, W, fam){
 }
 
 
-####################################################################################
+############################################################################################
 #' \code{d2_wcgf} is a function computing the hessian of the weighted cumulant
 #' generating function (WCGF) of distributions from GLM family
 #'
 #' @inheritParams wcgf
 #'
-#' @return CGF of the weighted distribution evaluated at \code{s}.
+#' @return Second derivative of CGF of the weighted distribution evaluated at \code{s}.
 #' @keywords internal
 d2_wcgf <- function(s, P, W, fam){
 
@@ -227,8 +228,9 @@ d2_wcgf <- function(s, P, W, fam){
 }
 
 
-#######################################################################################################
-#' \code{nb_precomp} is a function computing the dispersion parameter in negative binomial regression
+############################################################################################
+#' \code{nb_precomp} is a function computing the dispersion parameter in negative
+#' binomial regression
 #'
 #' @param data A list containing the response Y and covariate Z
 #'
@@ -254,15 +256,12 @@ nb_precomp <- function(data){
 
 
 
-#####################################################################################
-#' Fit models to data
-#'
-#' \code{fit_models} is a function carrying out the saddlepoint approximation to the
-#' dCRT based on GLMs for `X|Z` and `Y|Z`.
+############################################################################################
+#' \code{fit_models} is a function carrying out the regressions `X` on `Z` and `Y` on `Z`.
 #'
 #' @inheritParams GCM
 #'
-#' @return Fitted values.
+#' @return A named list of fitted values of X|Z and Y|Z.
 #' @keywords internal
 fit_models <- function(data,
                        X_on_Z_fam, Y_on_Z_fam,
@@ -273,77 +272,79 @@ fit_models <- function(data,
 
    # extract (X,Y,Z) from inputted data
    X <- data$X; Y <- data$Y; Z <- data$Z
-   additional_info <- list()
 
-   if(fitting_X_on_Z == 'glm'){
-      # fit X on Z regression when fitting method is glm
-      X_on_Z_fit <- suppressWarnings(stats::glm(X ~ Z, family = X_on_Z_fam))
-      X_on_Z_fit_vals <- X_on_Z_fit$fitted.values
-   } else if(fitting_X_on_Z %in% c('rf','prob_forest')){
-      # fit X on Z regression when fitting method is random forest
-      if(X_on_Z_fam == "binomial"){
-         p.forest.X <- grf::probability_forest(X = as.matrix(Z), Y = as.factor(X))
-         p.hat.X <- stats::predict(p.forest.X, as.matrix(Z), estimate.variance = F)
+   # fit X on Z regression
+   X_on_Z_fit_vals <- fit_single_model(V = X, Z = Z,
+                                       V_on_Z_fam = X_on_Z_fam,
+                                       fitting_V_on_Z = fitting_X_on_Z,
+                                       fit_vals_V_on_Z_own = fit_vals_X_on_Z_own)
 
-         X_on_Z_fit_vals <- p.hat.X$predictions[ ,"1"]
-      }
-   } else if(fitting_X_on_Z == 'own') {
-      # Validate that fit_vals_X_on_Z_own is provided and contains necessary components
-      if(!is.numeric(fit_vals_X_on_Z_own)) {
-         stop("fit_vals_X_on_Z_own must be a vector containing 'X_on_Z_fit_vals' when using fitting_X_on_Z = 'own'")
-      }
-      # Extract pre-computed values from fit_vals_X_on_Z_own
-      X_on_Z_fit_vals <- fit_vals_X_on_Z_own
-   }
-
-
-   if(fitting_Y_on_Z == 'glm'){
-     # fit Y on Z regression when fitting method is glm
-     if(Y_on_Z_fam == "negative.binomial"){
-       aux_info_Y_on_Z <- nb_precomp(list(Y = Y, Z = Z))
-
-       Y_on_Z_fit <- stats::glm(Y ~ Z,
-                                family = MASS::negative.binomial(aux_info_Y_on_Z$theta_hat),
-                                mustart = aux_info_Y_on_Z$fitted_values) |> suppressWarnings()
-       Y_on_Z_fit_vals <- Y_on_Z_fit$fitted.values
-
-       additional_info$NB.disp.param <- aux_info_Y_on_Z$theta_hat
-     } else{
-       Y_on_Z_fit <- suppressWarnings(stats::glm(Y ~ Z, family = Y_on_Z_fam))
-       Y_on_Z_fit_vals <- Y_on_Z_fit$fitted.values
-
-       additional_info$NB.disp.param <- NA
-     }
-   } else if(fitting_Y_on_Z %in% c('rf','prob_forest')){
-     # fit Y on Z regression when fitting method is random forest
-     if(Y_on_Z_fam == "binomial"){
-       p.forest.Y <- grf::probability_forest(X = as.matrix(Z), Y = as.factor(Y))
-       p.hat.Y <- stats::predict(p.forest.Y, as.matrix(Z), estimate.variance = F)
-
-       Y_on_Z_fit_vals <- p.hat.Y$predictions[ ,"1"]
-     }
-
-     additional_info$NB.disp.param <- NA
-   } else if(fitting_Y_on_Z == 'own') {
-     # Validate that fit_vals_Y_on_Z_own is provided and contains necessary components
-     if(!is.numeric(fit_vals_Y_on_Z_own)) {
-       stop("fit_vals_Y_on_Z_own must be a vector containing 'Y_on_Z_fit_vals' when using fitting_Y_on_Z = 'own'")
-     }
-
-     # Extract pre-computed values from fit_vals_Y_on_Z_own
-     Y_on_Z_fit_vals <- fit_vals_Y_on_Z_own
-
-     additional_info$NB.disp.param <- NA
-   }
+   # fit Y on Z regression
+   Y_on_Z_fit_vals <- fit_single_model(V = Y, Z = Z,
+                                       V_on_Z_fam = Y_on_Z_fam,
+                                       fitting_V_on_Z = fitting_Y_on_Z,
+                                       fit_vals_V_on_Z_own = fit_vals_Y_on_Z_own)
 
    return(list(X_on_Z_fit_vals = X_on_Z_fit_vals,
-               Y_on_Z_fit_vals = Y_on_Z_fit_vals,
-               additional_info = additional_info))
+               Y_on_Z_fit_vals = Y_on_Z_fit_vals))
 }
 
 
 
+############################################################################################
+#' \code{fit_single_model} is a function carrying out a single regression `V` on `Z`, where
+#' `V` is the variable/response and `Z` is the covariate.
+#'
+#' @param V Vector of variable/response.
+#' @param Z Matrix of covariates.
+#' @param V_on_Z_fam The GLM family for the regression of V on Z
+#' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).
+#' @param fitting_V_on_Z The fitting method for the regression V on Z
+#' (values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).
+#' @param fit_vals_V_on_Z_own Vector of fitted values for V on Z in case the user's custom method.
+#' Works only if fitting_V_on_Z = 'own'.
+#'
+#' @return A vector of fitted values of V|Z.
+#' @keywords internal
+fit_single_model <- function(V, Z,
+                             V_on_Z_fam,
+                             fitting_V_on_Z = 'glm',
+                             fit_vals_V_on_Z_own = NULL){
 
+  if(fitting_V_on_Z == 'glm'){
+    # fit V on Z regression when fitting method is glm
+    if(V_on_Z_fam == "negative.binomial"){
+      aux_info_V_on_Z <- nb_precomp(list(V = V, Z = Z))
+
+      V_on_Z_fit <- stats::glm(V ~ Z,
+                               family = MASS::negative.binomial(aux_info_V_on_Z$theta_hat),
+                               mustart = aux_info_V_on_Z$fitted_values) |> suppressWarnings()
+
+      V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
+    } else{
+      V_on_Z_fit <- suppressWarnings(stats::glm(V ~ Z, family = V_on_Z_fam))
+      V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
+    }
+  } else if(fitting_V_on_Z %in% c('rf','prob_forest')){
+    # fit V on Z regression when fitting method is random forest
+    if(V_on_Z_fam == "binomial"){
+      p.forest.V <- grf::probability_forest(X = as.matrix(Z), Y = as.factor(V))
+      p.hat.V <- stats::predict(p.forest.V, as.matrix(Z), estimate.variance = F)
+
+      V_on_Z_fit_vals <- p.hat.V$predictions[ ,"1"]
+    }
+  } else if(fitting_V_on_Z == 'own') {
+    # Validate that fit_vals_V_on_Z_own is provided and contains necessary components
+    if(!is.numeric(fit_vals_V_on_Z_own)) {
+      stop("fit_vals_V_on_Z_own must be a vector containing 'V_on_Z_fit_vals' when using fitting_V_on_Z = 'own'")
+    }
+
+    # Extract pre-computed values from fit_vals_V_on_Z_own
+    V_on_Z_fit_vals <- fit_vals_V_on_Z_own
+  }
+
+  return(V_on_Z_fit_vals)
+}
 
 
 
