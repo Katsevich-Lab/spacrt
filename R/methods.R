@@ -35,7 +35,8 @@
 #'     fitting_Y_on_Z = 'glm')
 #'
 #' @export
-GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
+GCM <- function(data,
+                X_on_Z_fam, Y_on_Z_fam,
                 fitting_X_on_Z = 'glm',
                 fitting_Y_on_Z = 'glm',
                 fit_vals_X_on_Z_own = NULL,
@@ -104,7 +105,8 @@ GCM <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #'      B = 2000)
 #'
 #' @export
-dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
+dCRT <- function(data,
+                 X_on_Z_fam, Y_on_Z_fam,
                  fitting_X_on_Z = 'glm',
                  fitting_Y_on_Z = 'glm',
                  fit_vals_X_on_Z_own = NULL,
@@ -196,10 +198,10 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #' Y_on_Z_fam <- "binomial"
 #'
 #' dtrain <- xgboost::xgb.DMatrix(data = data$Z, label = data$Y)
-#' model <- xgboost::xgboost(data = dtrain,
-#'                           objective = "binary:logistic",
-#'                           nrounds = 50, verbose = 0)
-#' predicted <- stats::predict(model, newdata = data$Z)
+#' model.Y <- xgboost::xgboost(data = dtrain,
+#'                             objective = "binary:logistic",
+#'                             nrounds = 50, verbose = 0)
+#' predicted <- stats::predict(model.Y, newdata = data$Z)
 #'
 #' spaCRT(data, X_on_Z_fam, Y_on_Z_fam,
 #'        fitting_X_on_Z = 'glm',
@@ -207,7 +209,8 @@ dCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
 #'        fit_vals_Y_on_Z_own = predicted)
 #'
 #' @export
-spaCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
+spaCRT <- function(data,
+                   X_on_Z_fam, Y_on_Z_fam,
                    fitting_X_on_Z = 'glm',
                    fitting_Y_on_Z = 'glm',
                    fit_vals_X_on_Z_own = NULL,
@@ -227,8 +230,6 @@ spaCRT <- function(data, X_on_Z_fam, Y_on_Z_fam,
                         Y_on_Z_fit_vals = fitted_vals$Y_on_Z_fit_vals,
                         fam = X_on_Z_fam,
                         R = 5, max_expansions = 10) |> suppressWarnings()
-
-  NB.disp.param <- fitted_vals$additional_info$NB.disp.param
 
   # compute p-value based on alternative
   p.left <- spa_result$p.left
