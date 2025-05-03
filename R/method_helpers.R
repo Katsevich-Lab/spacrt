@@ -1,3 +1,8 @@
+#' @useDynLib spacrt, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
+NULL
+
+
 ############################################################################################
 #' \code{spa_cdf} SPA to CDF of T_n = S_n / sqrt(n)
 #'
@@ -27,7 +32,6 @@
 #'                  X_on_Z_fit_vals = X_on_Z_fit$fitted.values,
 #'                  Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values,
 #'                  fam = "binomial", R = 1000)
-#' @keywords internal
 spa_cdf <- function(X, Y,
                     X_on_Z_fit_vals,
                     Y_on_Z_fit_vals,
@@ -115,7 +119,6 @@ spa_cdf <- function(X, Y,
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #'
 #' @return Simulated data from an appropriate distribution.
-#' @keywords internal
 dCRT_dist <- function(n, fitted.val, fam){
 
   if(fam == 'binomial') return(stats::rbinom(n = n, size = 1, prob = fitted.val))
@@ -140,7 +143,6 @@ dCRT_dist <- function(n, fitted.val, fam){
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #'
 #' @return CGF of the weighted distribution evaluated at \code{s}.
-#' @keywords internal
 wcgf <- function(s, P, W, fam){
 
   if(fam == 'binomial') return(sum(log(exp(s*W)*P + 1 - P)))
@@ -161,7 +163,6 @@ wcgf <- function(s, P, W, fam){
 #' @inheritParams wcgf
 #'
 #' @return First derivative of CGF of the weighted distribution evaluated at \code{s}.
-#' @keywords internal
 d1_wcgf <- function(s, P, W, fam){
 
   # if(fam == 'binomial') return(sum((W*P*exp(s*W)) / (exp(s*W)*P + 1 - P)))
@@ -183,7 +184,6 @@ d1_wcgf <- function(s, P, W, fam){
 #' @inheritParams wcgf
 #'
 #' @return Second derivative of CGF of the weighted distribution evaluated at \code{s}.
-#' @keywords internal
 d2_wcgf <- function(s, P, W, fam){
 
   if(fam == 'binomial'){
@@ -234,14 +234,19 @@ d2_wcgf <- function(s, P, W, fam){
 #'
 #' @param data A list containing the response Y and covariate Z
 #'
-#' @return a list containing the Poisson model fitted values and estimate for dispersion
-#' @keywords internal
+#' @return A named list with the following components:
+#' \describe{
+#'   \item{fitted_values}{The fitted values from the Poisson regression of \code{Y} on \code{Z}.}
+#'   \item{theta_hat}{The estimated dispersion parameter (theta) for the negative binomial model, computed via maximum likelihood or method of moments.}
+#' }
 nb_precomp <- function(data){
 
   Y <- data$Y; Z <- data$Z
 
+  # Fit Poisson GLM: Y ~ Z
   pois_fit <- stats::glm.fit(y = Y, x = Z, family = stats::poisson())
 
+  # Estimate NB dispersion parameter using C++ function estimate_theta
   theta_hat <- estimate_theta(
     y = Y,
     mu = pois_fit$fitted.values,
@@ -250,8 +255,12 @@ nb_precomp <- function(data){
     eps = (.Machine$double.eps)^(1/4)
   )[[1]]
 
-  return(list(fitted_values = pois_fit$fitted.values, theta_hat = theta_hat))
+  return(list(fitted_values = pois_fit$fitted.values,
+              theta_hat = theta_hat))
 }
+
+
+
 
 
 
@@ -262,7 +271,6 @@ nb_precomp <- function(data){
 #' @inheritParams GCM
 #'
 #' @return A named list of fitted values of X|Z and Y|Z.
-#' @keywords internal
 fit_models <- function(data,
                        X_on_Z_fam, Y_on_Z_fam,
                        fitting_X_on_Z = 'glm',
@@ -305,7 +313,6 @@ fit_models <- function(data,
 #' Works only if fitting_V_on_Z = 'own'.
 #'
 #' @return A vector of fitted values of V|Z.
-#' @keywords internal
 fit_single_model <- function(V, Z,
                              V_on_Z_fam,
                              fitting_V_on_Z = 'glm',
