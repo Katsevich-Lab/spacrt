@@ -3,3 +3,5 @@
 export(GCM)
 export(dCRT)
 export(spaCRT)
+importFrom(Rcpp,sourceCpp)
+useDynLib(spacrt, .registration = TRUE)
