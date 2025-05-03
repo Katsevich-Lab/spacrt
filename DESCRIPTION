@@ -7,7 +7,7 @@ Authors@R: c(
     person("Eugene", "Katsevich", , "ekatsevi@wharton.upenn.edu", role = c("aut"))
     )
 Description: The saddlepoint approximation-based conditional randomization test, abbreviated as `spaCRT`, is a fast and accurate method for testing conditional independence. By approximating the resampling distribution of the distilled conditional randomization test (dCRT) using saddlepoint approximation, spaCRT achieves similar statistical performance in terms of type-I error control, p-value calibration, and power; with substantially lower computational cost.
-License: MIT + file LICENSE
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
