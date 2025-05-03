@@ -42,4 +42,3 @@ A named list of fitted values of X|Z and Y|Z.
 \description{
 \code{fit_models} is a function carrying out the regressions \code{X} on \code{Z} and \code{Y} on \code{Z}.
 }
-\keyword{internal}

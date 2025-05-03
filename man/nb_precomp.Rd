@@ -11,10 +11,13 @@ nb_precomp(data)
 \item{data}{A list containing the response Y and covariate Z}
 }
 \value{
-a list containing the Poisson model fitted values and estimate for dispersion
+A named list with the following components:
+\describe{
+\item{fitted_values}{The fitted values from the Poisson regression of \code{Y} on \code{Z}.}
+\item{theta_hat}{The estimated dispersion parameter (theta) for the negative binomial model, computed via maximum likelihood or method of moments.}
+}
 }
 \description{
 \code{nb_precomp} is a function computing the dispersion parameter in negative
 binomial regression
 }
-\keyword{internal}

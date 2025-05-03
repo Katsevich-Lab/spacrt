@@ -24,4 +24,3 @@ First derivative of CGF of the weighted distribution evaluated at \code{s}.
 \code{d1_wcgf} is a function computing the derivative of the weighted cumulant
 generating function (WCGF) of distributions from GLM family
 }
-\keyword{internal}

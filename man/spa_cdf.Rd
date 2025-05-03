@@ -52,4 +52,3 @@ spacrt:::spa_cdf(X = X, Y = Y,
                  Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values,
                  fam = "binomial", R = 1000)
 }
-\keyword{internal}

@@ -34,4 +34,3 @@ A vector of fitted values of V|Z.
 \code{fit_single_model} is a function carrying out a single regression \code{V} on \code{Z}, where
 \code{V} is the variable/response and \code{Z} is the covariate.
 }
-\keyword{internal}
