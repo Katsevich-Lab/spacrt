@@ -13,7 +13,6 @@ NULL
 #' @param fam The GLM family which includes the distribution whose CGF is being
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #' @param R stats::uniroot() search space endpoint
-#' @param max_expansions Maximum number of times stats::uniroot() search space
 #' should be broadened.
 #'
 #' @return \code{test statistic}, \code{left-sided p-value}, \code{right-sided p-value},
@@ -36,7 +35,7 @@ spa_cdf <- function(X, Y,
                     X_on_Z_fit_vals,
                     Y_on_Z_fit_vals,
                     fam,
-                    R = 5, max_expansions = 10){
+                    R = 5){
 
   P <- X_on_Z_fit_vals
   W <- Y - Y_on_Z_fit_vals
@@ -50,29 +49,44 @@ spa_cdf <- function(X, Y,
 
   t <- test_stat + 1/sqrt(n) * sum(P*W)
 
-  current_lower <- -abs(R)
-  current_upper <- abs(R)
+  # current_lower <- -abs(R)
+  # current_upper <- abs(R)
+  # success_uniroot <- FALSE
+  #
+  # for (i in seq_len(max_expansions)) {
+  #   tryCatch({
+  #     # solve the saddlepoint equation
+  #     s.hat <- stats::uniroot(
+  #       f = function(s) d1_wcgf(s, P = P, W = W, fam) - sqrt(n)*t,
+  #       lower = current_lower, upper = current_upper, tol = .Machine$double.eps)$root
+  #
+  #     success_uniroot <- TRUE
+  #     break
+  #   }, error = function(e) {
+  #     # expand the search space if the saddlepoint is not found
+  #     expansion_factor <- ifelse(i <= max_expansions/2, 2, 10)
+  #     current_lower <<- current_lower * expansion_factor
+  #     current_upper <<- current_upper * expansion_factor
+  #   }
+  #   )
+  #
+  #   if(success_uniroot == TRUE) break
+  # }
+
   success_uniroot <- FALSE
 
-  for (i in seq_len(max_expansions)) {
-    tryCatch({
-      # solve the saddlepoint equation
-      s.hat <- stats::uniroot(
-        f = function(s) d1_wcgf(s, P = P, W = W, fam) - sqrt(n)*t,
-        lower = current_lower, upper = current_upper, tol = .Machine$double.eps)$root
+  tryCatch({
+    # try to solve the saddlepoint equation
+    s.hat <- stats::uniroot(
+      f = function(s) d1_wcgf(s, P = P, W = W, fam) - sqrt(n)*t,
+      lower = current_lower, upper = current_upper,
+      extendInt = "yes",
+      tol = .Machine$double.eps)$root
 
-      success_uniroot <- TRUE
-      break
-    }, error = function(e) {
-      # expand the search space if the saddlepoint is not found
-      expansion_factor <- ifelse(i <= max_expansions/2, 2, 10)
-      current_lower <<- current_lower * expansion_factor
-      current_upper <<- current_upper * expansion_factor
-    }
-    )
+    success_uniroot <- TRUE
+  }, error = function(e) {message("stats::uniroot() failed: ", conditionMessage(e))}
+  )
 
-    if(success_uniroot == TRUE) break
-  }
 
   if(success_uniroot == TRUE && {
       suppressWarnings({
@@ -232,19 +246,22 @@ d2_wcgf <- function(s, P, W, fam){
 #' \code{nb_precomp} is a function computing the dispersion parameter in negative
 #' binomial regression
 #'
-#' @param data A list containing the response Y and covariate Z
+#' @param V A list containing the response V
+#' @param Z A list containing the covariate Z
 #'
 #' @return A named list with the following components:
 #' \describe{
 #'   \item{fitted_values}{The fitted values from the Poisson regression of \code{Y} on \code{Z}.}
 #'   \item{theta_hat}{The estimated dispersion parameter (theta) for the negative binomial model, computed via maximum likelihood or method of moments.}
 #' }
-nb_precomp <- function(data){
+nb_precomp <- function(V,Z){
 
-  Y <- data$Y; Z <- data$Z
+  # Y <- data$Y; Z <- data$Z
 
   # Fit Poisson GLM: Y ~ Z
-  pois_fit <- stats::glm.fit(y = Y, x = Z, family = stats::poisson())
+  pois_fit <- stats::glm.fit(y = V, x = Z, family = stats::poisson())
+  # df <- data.frame(V = V, Z = Z)
+  # pois_fit <- stats::glm(V ~ Z, data = df, family = stats::poisson())
 
   # Estimate NB dispersion parameter using C++ function estimate_theta
   theta_hat <- estimate_theta(
@@ -321,7 +338,7 @@ fit_single_model <- function(V, Z,
   if(fitting_V_on_Z == 'glm'){
     # fit V on Z regression when fitting method is glm
     if(V_on_Z_fam == "negative.binomial"){
-      aux_info_V_on_Z <- nb_precomp(list(V = V, Z = Z))
+      aux_info_V_on_Z <- nb_precomp(V = V, Z = Z)
 
       V_on_Z_fit <- stats::glm(V ~ Z,
                                family = MASS::negative.binomial(aux_info_V_on_Z$theta_hat),
