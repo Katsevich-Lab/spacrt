@@ -21,7 +21,12 @@
 #' (values can be "two.sided" (default), "greater", or "less"; meant for both-sided, right-sided,
 #' and left-sided p-values, respectively).
 #'
-#' @return A named list with fields \code{test_stat} and \code{p_value}.
+#' @return
+#' An named list containing the following fields:
+#' \describe{
+#'   \item{test_stat}{The test statistic.}
+#'   \item{p_value}{The p-value under the specified alternative.}
+#' }
 #'
 #' @examples
 #' n <- 20; p <- 2
@@ -89,7 +94,12 @@ GCM <- function(data,
 #' @inheritParams GCM
 #' @param B The number of resamples to draw (Default value is 2000).
 #'
-#' @return A named list with fields \code{test_stat} and \code{p_value}.
+#' @return
+#' An named list containing the following fields:
+#' \describe{
+#'   \item{test_stat}{The test statistic.}
+#'   \item{p_value}{The p-value under the specified alternative.}
+#' }
 #'
 #' @examples
 #' n <- 80; p <- 2; B <- 100
@@ -171,7 +181,12 @@ dCRT <- function(data,
 #'
 #' @inheritParams GCM
 #'
-#' @return A named list with fields \code{test_stat}, \code{p_value}, and \code{spa.success}.
+#' @return
+#' An named list containing the following fields:
+#' \describe{
+#'   \item{test_stat}{The test statistic.}
+#'   \item{p_value}{The p-value under the specified alternative.}
+#' }
 #' \code{spa.success} returns TRUE if the saddlepoint equation could be solved; otherwise,
 #' the backup method (GCM) was employed due to the failure of spaCRT.
 #'
