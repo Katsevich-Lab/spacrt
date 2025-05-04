@@ -4,20 +4,12 @@
 \alias{spa_cdf}
 \title{\code{spa_cdf} SPA to CDF of T_n = S_n / sqrt(n)}
 \usage{
-spa_cdf(
-  X,
-  Y,
-  X_on_Z_fit_vals,
-  Y_on_Z_fit_vals,
-  fam,
-  R = 5,
-  max_expansions = 10
-)
+spa_cdf(X, Y, X_on_Z_fit_vals, Y_on_Z_fit_vals, fam, R = 5)
 }
 \arguments{
-\item{X}{The point where the CGF will be computed.}
+\item{X}{X}
 
-\item{Y}{The point where the CGF will be computed.}
+\item{Y}{Y.}
 
 \item{X_on_Z_fit_vals}{X_on_Z_fit$fitted.values}
 
@@ -26,9 +18,7 @@ spa_cdf(
 \item{fam}{The GLM family which includes the distribution whose CGF is being
 evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).}
 
-\item{R}{stats::uniroot() search space endpoint}
-
-\item{max_expansions}{Maximum number of times stats::uniroot() search space
+\item{R}{stats::uniroot() search space endpoint
 should be broadened.}
 }
 \value{
@@ -50,5 +40,5 @@ Y_on_Z_fit <- suppressWarnings(stats::glm(Y ~ Z, family = "poisson"))
 spacrt:::spa_cdf(X = X, Y = Y,
                  X_on_Z_fit_vals = X_on_Z_fit$fitted.values,
                  Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values,
-                 fam = "binomial", R = 1000)
+                 fam = "binomial", R = 100)
 }
