@@ -6,8 +6,8 @@ NULL
 ############################################################################################
 #' \code{spa_cdf} SPA to CDF of T_n = S_n / sqrt(n)
 #'
-#' @param X The point where the CGF will be computed.
-#' @param Y The point where the CGF will be computed.
+#' @param X X
+#' @param Y Y.
 #' @param X_on_Z_fit_vals X_on_Z_fit$fitted.values
 #' @param Y_on_Z_fit_vals Y_on_Z_fit$fitted.values
 #' @param fam The GLM family which includes the distribution whose CGF is being
@@ -30,7 +30,7 @@ NULL
 #' spacrt:::spa_cdf(X = X, Y = Y,
 #'                  X_on_Z_fit_vals = X_on_Z_fit$fitted.values,
 #'                  Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values,
-#'                  fam = "binomial", R = 1000)
+#'                  fam = "binomial", R = 100)
 spa_cdf <- function(X, Y,
                     X_on_Z_fit_vals,
                     Y_on_Z_fit_vals,
@@ -52,6 +52,8 @@ spa_cdf <- function(X, Y,
   # current_lower <- -abs(R)
   # current_upper <- abs(R)
   # success_uniroot <- FALSE
+  #
+  # max_expansions <- 10
   #
   # for (i in seq_len(max_expansions)) {
   #   tryCatch({
@@ -79,7 +81,7 @@ spa_cdf <- function(X, Y,
     # try to solve the saddlepoint equation
     s.hat <- stats::uniroot(
       f = function(s) d1_wcgf(s, P = P, W = W, fam) - sqrt(n)*t,
-      lower = current_lower, upper = current_upper,
+      lower = -abs(R), upper = abs(R),
       extendInt = "yes",
       tol = .Machine$double.eps)$root
 
@@ -258,14 +260,12 @@ nb_precomp <- function(V,Z){
 
   # Y <- data$Y; Z <- data$Z
 
-  # Fit Poisson GLM: Y ~ Z
-  pois_fit <- stats::glm.fit(y = V, x = Z, family = stats::poisson())
-  # df <- data.frame(V = V, Z = Z)
-  # pois_fit <- stats::glm(V ~ Z, data = df, family = stats::poisson())
+  # Fit Poisson GLM: Y ~ Z with intercept
+  pois_fit <- stats::glm.fit(y = V, x = cbind(1,Z), family = stats::poisson())
 
   # Estimate NB dispersion parameter using C++ function estimate_theta
   theta_hat <- estimate_theta(
-    y = Y,
+    y = V,
     mu = pois_fit$fitted.values,
     dfr = pois_fit$df.residual,
     limit = 50,
