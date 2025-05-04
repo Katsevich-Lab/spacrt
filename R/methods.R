@@ -229,7 +229,7 @@ spaCRT <- function(data,
                         X_on_Z_fit_vals = fitted_vals$X_on_Z_fit_vals,
                         Y_on_Z_fit_vals = fitted_vals$Y_on_Z_fit_vals,
                         fam = X_on_Z_fam,
-                        R = 5, max_expansions = 10) |> suppressWarnings()
+                        R = 5) |> suppressWarnings()
 
   # compute p-value based on alternative
   p.left <- spa_result$p.left
