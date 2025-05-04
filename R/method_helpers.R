@@ -31,6 +31,8 @@ NULL
 #'                  X_on_Z_fit_vals = X_on_Z_fit$fitted.values,
 #'                  Y_on_Z_fit_vals = Y_on_Z_fit$fitted.values,
 #'                  fam = "binomial", R = 100)
+#'
+#' @keywords internal
 spa_cdf <- function(X, Y,
                     X_on_Z_fit_vals,
                     Y_on_Z_fit_vals,
@@ -48,32 +50,6 @@ spa_cdf <- function(X, Y,
   test_stat <- 1/sqrt(n) * sum(prod_resids)
 
   t <- test_stat + 1/sqrt(n) * sum(P*W)
-
-  # current_lower <- -abs(R)
-  # current_upper <- abs(R)
-  # success_uniroot <- FALSE
-  #
-  # max_expansions <- 10
-  #
-  # for (i in seq_len(max_expansions)) {
-  #   tryCatch({
-  #     # solve the saddlepoint equation
-  #     s.hat <- stats::uniroot(
-  #       f = function(s) d1_wcgf(s, P = P, W = W, fam) - sqrt(n)*t,
-  #       lower = current_lower, upper = current_upper, tol = .Machine$double.eps)$root
-  #
-  #     success_uniroot <- TRUE
-  #     break
-  #   }, error = function(e) {
-  #     # expand the search space if the saddlepoint is not found
-  #     expansion_factor <- ifelse(i <= max_expansions/2, 2, 10)
-  #     current_lower <<- current_lower * expansion_factor
-  #     current_upper <<- current_upper * expansion_factor
-  #   }
-  #   )
-  #
-  #   if(success_uniroot == TRUE) break
-  # }
 
   success_uniroot <- FALSE
 
@@ -135,6 +111,8 @@ spa_cdf <- function(X, Y,
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #'
 #' @return Simulated data from an appropriate distribution.
+#'
+#' @keywords internal
 dCRT_dist <- function(n, fitted.val, fam){
 
   if(fam == 'binomial') return(stats::rbinom(n = n, size = 1, prob = fitted.val))
@@ -159,6 +137,8 @@ dCRT_dist <- function(n, fitted.val, fam){
 #' evaluated (values can be \code{gaussian}, \code{binomial}, \code{poisson}, etc).
 #'
 #' @return CGF of the weighted distribution evaluated at \code{s}.
+#'
+#' @keywords internal
 wcgf <- function(s, P, W, fam){
 
   if(fam == 'binomial') return(sum(log(exp(s*W)*P + 1 - P)))
@@ -179,6 +159,8 @@ wcgf <- function(s, P, W, fam){
 #' @inheritParams wcgf
 #'
 #' @return First derivative of CGF of the weighted distribution evaluated at \code{s}.
+#'
+#' @keywords internal
 d1_wcgf <- function(s, P, W, fam){
 
   # if(fam == 'binomial') return(sum((W*P*exp(s*W)) / (exp(s*W)*P + 1 - P)))
@@ -200,6 +182,8 @@ d1_wcgf <- function(s, P, W, fam){
 #' @inheritParams wcgf
 #'
 #' @return Second derivative of CGF of the weighted distribution evaluated at \code{s}.
+#'
+#' @keywords internal
 d2_wcgf <- function(s, P, W, fam){
 
   if(fam == 'binomial'){
@@ -256,6 +240,8 @@ d2_wcgf <- function(s, P, W, fam){
 #'   \item{fitted_values}{The fitted values from the Poisson regression of \code{Y} on \code{Z}.}
 #'   \item{theta_hat}{The estimated dispersion parameter (theta) for the negative binomial model, computed via maximum likelihood or method of moments.}
 #' }
+#'
+#' @keywords internal
 nb_precomp <- function(V,Z){
 
   # Y <- data$Y; Z <- data$Z
@@ -288,6 +274,8 @@ nb_precomp <- function(V,Z){
 #' @inheritParams GCM
 #'
 #' @return A named list of fitted values of X|Z and Y|Z.
+#'
+#' @keywords internal
 fit_models <- function(data,
                        X_on_Z_fam, Y_on_Z_fam,
                        fitting_X_on_Z = 'glm',
@@ -330,6 +318,8 @@ fit_models <- function(data,
 #' Works only if fitting_V_on_Z = 'own'.
 #'
 #' @return A vector of fitted values of V|Z.
+#'
+#' @keywords internal
 fit_single_model <- function(V, Z,
                              V_on_Z_fam,
                              fitting_V_on_Z = 'glm',

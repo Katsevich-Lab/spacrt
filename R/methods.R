@@ -6,9 +6,9 @@
 #' @param data A (non-empty) named list with fields \code{X} (an nx1 vector for the predictor
 #' variable of interest), \code{Y} (an nx1 response vector), and \code{Z} (an nxp matrix of covariates).
 #' @param X_on_Z_fam The GLM family for the regression of X on Z
-#' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).
+#' (values can be \code{binomial}, or \code{poisson}).
 #' @param Y_on_Z_fam The GLM family for the regression of Y on Z
-#' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).
+#' (values can be \code{binomial}, \code{poisson}, or \code{negative.binomial}).
 #' @param fitting_X_on_Z The fitting method for the regression X on Z
 #' (values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).
 #' @param fitting_Y_on_Z The fitting method for the regression Y on Z
@@ -22,7 +22,7 @@
 #' and left-sided p-values, respectively).
 #'
 #' @return
-#' An named list containing the following fields:
+#' A named list containing the following fields:
 #' \describe{
 #'   \item{test_stat}{The test statistic.}
 #'   \item{p_value}{The p-value under the specified alternative.}
@@ -182,13 +182,14 @@ dCRT <- function(data,
 #' @inheritParams GCM
 #'
 #' @return
-#' An named list containing the following fields:
+#' A named list containing the following fields:
 #' \describe{
-#'   \item{test_stat}{The test statistic.}
-#'   \item{p_value}{The p-value under the specified alternative.}
+#'   \item{\code{test_stat}}{The test statistic.}
+#'   \item{\code{p_value}}{The p-value under the specified alternative.}
+#'   \item{\code{spa.success}}{A logical variable that returns TRUE if the
+#'   saddlepoint equation could be solved; otherwise, the backup method (GCM)
+#'   was employed due to the failure of spaCRT.}
 #' }
-#' \code{spa.success} returns TRUE if the saddlepoint equation could be solved; otherwise,
-#' the backup method (GCM) was employed due to the failure of spaCRT.
 #'
 #' @examples
 #' ## Example 1

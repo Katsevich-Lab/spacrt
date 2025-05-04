@@ -23,3 +23,4 @@ Simulated data from an appropriate distribution.
 \code{dCRT_dist} is a function that returns simulated data from an appropriate
 distribution depending on a specified  GLM family
 }
+\keyword{internal}

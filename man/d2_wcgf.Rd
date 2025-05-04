@@ -24,3 +24,4 @@ Second derivative of CGF of the weighted distribution evaluated at \code{s}.
 \code{d2_wcgf} is a function computing the hessian of the weighted cumulant
 generating function (WCGF) of distributions from GLM family
 }
+\keyword{internal}

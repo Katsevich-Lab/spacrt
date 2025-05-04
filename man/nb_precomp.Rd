@@ -23,3 +23,4 @@ A named list with the following components:
 \code{nb_precomp} is a function computing the dispersion parameter in negative
 binomial regression
 }
+\keyword{internal}

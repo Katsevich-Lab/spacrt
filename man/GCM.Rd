@@ -20,10 +20,10 @@ GCM(
 variable of interest), \code{Y} (an nx1 response vector), and \code{Z} (an nxp matrix of covariates).}
 
 \item{X_on_Z_fam}{The GLM family for the regression of X on Z
-(values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).}
+(values can be \code{binomial}, or \code{poisson}).}
 
 \item{Y_on_Z_fam}{The GLM family for the regression of Y on Z
-(values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).}
+(values can be \code{binomial}, \code{poisson}, or \code{negative.binomial}).}
 
 \item{fitting_X_on_Z}{The fitting method for the regression X on Z
 (values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).}
@@ -42,7 +42,11 @@ Works only if fitting_Y_on_Z = 'own'.}
 and left-sided p-values, respectively).}
 }
 \value{
-A named list with fields \code{test_stat} and \code{p_value}.
+A named list containing the following fields:
+\describe{
+\item{test_stat}{The test statistic.}
+\item{p_value}{The p-value under the specified alternative.}
+}
 }
 \description{
 \code{GCM} is a function carrying out the GCM test based on GLMs for \code{X|Z} and \code{Y|Z}.
