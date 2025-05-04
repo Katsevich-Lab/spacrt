@@ -5,10 +5,12 @@
 \title{\code{nb_precomp} is a function computing the dispersion parameter in negative
 binomial regression}
 \usage{
-nb_precomp(data)
+nb_precomp(V, Z)
 }
 \arguments{
-\item{data}{A list containing the response Y and covariate Z}
+\item{V}{A list containing the response V}
+
+\item{Z}{A list containing the covariate Z}
 }
 \value{
 A named list with the following components:
