@@ -9,21 +9,21 @@
 #'   Numeric vector of length n for the response variable.
 #' @param Z
 #'   Numeric matrix (n × p) of covariates.
-#' @param X_on_Z_fam The GLM family for the regression of X on Z
-#' (values can be \code{binomial}, or \code{poisson}).
-#' @param Y_on_Z_fam The GLM family for the regression of Y on Z
-#' (values can be \code{binomial}, \code{poisson}, or \code{negative.binomial}).
-#' @param fitting_X_on_Z The fitting method for the regression X on Z
-#' (values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).
-#' @param fitting_Y_on_Z The fitting method for the regression Y on Z
-#' (values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).
-#' @param fit_vals_X_on_Z_own Vector of fitted values for X on Z in case the user's custom method.
-#' Works only if fitting_X_on_Z = 'own'.
-#' @param fit_vals_Y_on_Z_own Vector of fitted values for Y on Z in case the user's custom method.
-#' Works only if fitting_Y_on_Z = 'own'.
-#' @param alternative A character string specifying the alternative hypothesis
-#' (values can be "two.sided" (default), "greater", or "less"; meant for both-sided, right-sided,
-#' and left-sided p-values, respectively).
+#' @param family
+#'   Named list with elements `XZ` and `YZ` specifying the distribution or loss
+#'   (e.g. `"binomial"`, `"poisson"`) for each model.
+#'   Ignored for any model where you supply your own fitted values via `fitted.own`.
+#' @param method
+#'   Named list with elements `XZ` and `YZ` that selects the fitting engine
+#'   for each model. Each element must be a string (e.g. `"glm"`, `"rf"`).
+#'   Ignored for any model where you supply your own fitted values via `fitted.own`.
+#' @param fitted.own
+#'   Named list with elements `XZ` and `YZ` of user-supplied fitted values
+#'   (numeric vectors of length n). For each non-NULL element, that model is
+#'   treated as custom and neither `method` nor `family` is used.
+#' @param alternative
+#'   A character string specifying the alternative hypothesis for the test.
+#'   Values can be "two.sided" (default), "greater", or "less".
 #'
 #' @return
 #' A named list containing the following fields:
@@ -45,24 +45,20 @@
 #'
 #' @export
 GCM <- function(X, Y, Z,
-                X_on_Z_fam, Y_on_Z_fam,
-                fitting_X_on_Z = 'glm',
-                fitting_Y_on_Z = 'glm',
-                fit_vals_X_on_Z_own = NULL,
-                fit_vals_Y_on_Z_own = NULL,
+                family,
+                method = list(XZ = 'glm', YZ = 'glm'),
+                fitted.own = list(XZ = NULL, YZ = NULL),
                 alternative = 'two.sided') {
 
   n <- length(X)
 
-  data <- list(X = X, Y = Y, Z = Z)
-
-  fitted_vals <- fit_models(data = data,
-                            X_on_Z_fam = X_on_Z_fam,
-                            Y_on_Z_fam = Y_on_Z_fam,
-                            fitting_X_on_Z = fitting_X_on_Z,
-                            fitting_Y_on_Z = fitting_Y_on_Z,
-                            fit_vals_X_on_Z_own = fit_vals_X_on_Z_own,
-                            fit_vals_Y_on_Z_own = fit_vals_Y_on_Z_own) |> suppressWarnings()
+  fitted_vals <- fit_models(X, Y, Z,
+                            family = list(XZ = family$XZ,
+                                          YZ = family$YZ),
+                            method = list(XZ = method$XZ,
+                                          YZ = method$YZ),
+                            fitted.own = list(XZ = fitted.own$XZ,
+                                              YZ = fitted.own$XZ)) |> suppressWarnings()
 
   X_on_Z_fit_vals <- fitted_vals$X_on_Z_fit_vals
   Y_on_Z_fit_vals <- fitted_vals$Y_on_Z_fit_vals
@@ -120,25 +116,21 @@ GCM <- function(X, Y, Z,
 #'
 #' @export
 dCRT <- function(X, Y, Z,
-                 X_on_Z_fam, Y_on_Z_fam,
-                 fitting_X_on_Z = 'glm',
-                 fitting_Y_on_Z = 'glm',
-                 fit_vals_X_on_Z_own = NULL,
-                 fit_vals_Y_on_Z_own = NULL,
+                 family,
+                 method = list(XZ = 'glm', YZ = 'glm'),
+                 fitted.own = list(XZ = NULL, YZ = NULL),
                  alternative = 'two.sided',
                  B = 2000) {
 
   n <- length(X)
 
-  data <- list(X = X, Y = Y, Z = Z)
-
-  fitted_vals <- fit_models(data = data,
-                            X_on_Z_fam = X_on_Z_fam,
-                            Y_on_Z_fam = Y_on_Z_fam,
-                            fitting_X_on_Z = fitting_X_on_Z,
-                            fitting_Y_on_Z = fitting_Y_on_Z,
-                            fit_vals_X_on_Z_own = fit_vals_X_on_Z_own,
-                            fit_vals_Y_on_Z_own = fit_vals_Y_on_Z_own) |> suppressWarnings()
+  fitted_vals <- fit_models(X, Y, Z,
+                            family = list(XZ = family$XZ,
+                                          YZ = family$YZ),
+                            method = list(XZ = method$XZ,
+                                          YZ = method$YZ),
+                            fitted.own = list(XZ = fitted.own$XZ,
+                                              YZ = fitted.own$XZ)) |> suppressWarnings()
 
   X_on_Z_fit_vals <- fitted_vals$X_on_Z_fit_vals
   Y_on_Z_fit_vals <- fitted_vals$Y_on_Z_fit_vals
@@ -154,7 +146,7 @@ dCRT <- function(X, Y, Z,
     # resampling X from X|Z
     resamp_X <- dCRT_dist(n = n,
                           fitted.val = X_on_Z_fit_vals,
-                          fam = X_on_Z_fam)
+                          fam = family$XZ)
 
     # compute the products of residuals for each resampled observation
     prod_resid_resamp[b] <- 1/sqrt(n) * sum((resamp_X - X_on_Z_fit_vals)*(Y - Y_on_Z_fit_vals))
@@ -230,27 +222,23 @@ dCRT <- function(X, Y, Z,
 #'
 #' @export
 spaCRT <- function(X, Y, Z,
-                   X_on_Z_fam, Y_on_Z_fam,
-                   fitting_X_on_Z = 'glm',
-                   fitting_Y_on_Z = 'glm',
-                   fit_vals_X_on_Z_own = NULL,
-                   fit_vals_Y_on_Z_own = NULL,
+                   family,
+                   method = list(XZ = 'glm', YZ = 'glm'),
+                   fitted.own = list(XZ = NULL, YZ = NULL),
                    alternative = 'two.sided') {
 
-  data <- list(X = X, Y = Y, Z = Z)
-
-  fitted_vals <- fit_models(data = data,
-                            X_on_Z_fam = X_on_Z_fam,
-                            Y_on_Z_fam = Y_on_Z_fam,
-                            fitting_X_on_Z = fitting_X_on_Z,
-                            fitting_Y_on_Z = fitting_Y_on_Z,
-                            fit_vals_X_on_Z_own = fit_vals_X_on_Z_own,
-                            fit_vals_Y_on_Z_own = fit_vals_Y_on_Z_own) |> suppressWarnings()
+  fitted_vals <- fit_models(X, Y, Z,
+                            family = list(XZ = family$XZ,
+                                          YZ = family$YZ),
+                            method = list(XZ = method$XZ,
+                                          YZ = method$YZ),
+                            fitted.own = list(XZ = fitted.own$XZ,
+                                              YZ = fitted.own$XZ)) |> suppressWarnings()
 
   spa_result <- spa_cdf(X = X, Y = Y,
                         X_on_Z_fit_vals = fitted_vals$X_on_Z_fit_vals,
                         Y_on_Z_fit_vals = fitted_vals$Y_on_Z_fit_vals,
-                        fam = X_on_Z_fam,
+                        fam = family$XZ,
                         R = 5) |> suppressWarnings()
 
   # compute p-value based on alternative
