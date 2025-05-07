@@ -33,20 +33,17 @@ fitting_X_on_Z <- 'rf'; fitting_Y_on_Z <- 'glm'
 
 
 results_GCM <- GCM(X, Y, Z,
-                   X_on_Z_fam, Y_on_Z_fam,
-                   fitting_X_on_Z = fitting_X_on_Z,
-                   fitting_Y_on_Z = fitting_Y_on_Z)
+                   family = list(XZ = X_on_Z_fam, YZ = Y_on_Z_fam),
+                   method = list(XZ = fitting_X_on_Z, YZ = fitting_Y_on_Z))
 
 results_dCRT <- dCRT(X, Y, Z,
-                     X_on_Z_fam, Y_on_Z_fam,
-                     fitting_X_on_Z = fitting_X_on_Z,
-                     fitting_Y_on_Z = fitting_Y_on_Z,
+                     family = list(XZ = X_on_Z_fam, YZ = Y_on_Z_fam),
+                     method = list(XZ = fitting_X_on_Z, YZ = fitting_Y_on_Z),
                      B = 10000)
 
 results_spaCRT <- spaCRT(X, Y, Z,
-                         X_on_Z_fam, Y_on_Z_fam,
-                         fitting_X_on_Z = fitting_X_on_Z,
-                         fitting_Y_on_Z = fitting_Y_on_Z)
+                         family = list(XZ = X_on_Z_fam, YZ = Y_on_Z_fam),
+                         method = list(XZ = fitting_X_on_Z, YZ = fitting_Y_on_Z))
 
 results_test_stat <- c(results_GCM$test_stat, results_dCRT$test_stat, results_spaCRT$test_stat)
 results_p_value <- c(results_GCM$p_value, results_dCRT$p_value, results_spaCRT$p_value)
