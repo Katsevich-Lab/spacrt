@@ -2,7 +2,7 @@ Package: spacrt
 Title: Saddlepoint approximation-based conditional randomization test
 Version: 0.1.0
 Authors@R: c(
-    person("Jyotishka", "Ray Choudhury", , "jyotishka.stat@gmail.com", role = c("aut", "cre")),
+    person("Jyotishka", "Ray Choudhury", , "jchoudhury3@gatech.edu", role = c("aut", "cre")),
     person("Ziang", "Niu", , "ziangniu@upenn.edu", role = c("aut")),
     person("Eugene", "Katsevich", , "ekatsevi@wharton.upenn.edu", role = c("aut"))
     )
@@ -13,16 +13,9 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Depends: R (>= 4.1.0)
 Imports: 
-    stats,
-    MASS,
-    Rcpp
+    stats, MASS, Rcpp
 Suggests:
-    sceptre, 
-    statmod, 
-    grf, 
-    xgboost,
-    testthat (>= 3.0.0)
+    sceptre, statmod, grf, xgboost,testthat (>= 3.0.0)
 Config/testthat/edition: 3
 LinkingTo: 
-    Rcpp, 
-    BH
+    Rcpp, BH
