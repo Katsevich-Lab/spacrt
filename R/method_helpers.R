@@ -6,8 +6,8 @@ NULL
 ############################################################################################
 #' \code{spa_cdf} SPA to CDF of T_n = S_n / sqrt(n)
 #'
-#' @param X X
-#' @param Y Y.
+#' @param X Numeric vector of length n for the predictor variable.
+#' @param Y Numeric vector of length n for the response variable.
 #' @param X_on_Z_fit_vals X_on_Z_fit$fitted.values
 #' @param Y_on_Z_fit_vals Y_on_Z_fit$fitted.values
 #' @param fam The GLM family which includes the distribution whose CGF is being
@@ -104,7 +104,7 @@ spa_cdf <- function(X, Y,
 #' \code{dCRT_dist} is a function that returns simulated data from an appropriate
 #' distribution depending on a specified  GLM family
 #'
-#' @param n The point where the CGF will be computed.
+#' @param n
 #' @param fitted.val A vector containing the fitted parameter values by
 #' fitting a GLM to X on Z.
 #' @param fam The GLM family which includes the distribution whose CGF is being
@@ -263,11 +263,6 @@ nb_precomp <- function(V,Z){
 }
 
 
-
-
-
-
-
 ############################################################################################
 #' \code{fit_models} is a function carrying out the regressions `X` on `Z` and `Y` on `Z`.
 #'
@@ -276,32 +271,26 @@ nb_precomp <- function(V,Z){
 #' @return A named list of fitted values of X|Z and Y|Z.
 #'
 #' @keywords internal
-fit_models <- function(data,
-                       X_on_Z_fam, Y_on_Z_fam,
-                       fitting_X_on_Z = 'glm',
-                       fitting_Y_on_Z = 'glm',
-                       fit_vals_X_on_Z_own = NULL,
-                       fit_vals_Y_on_Z_own = NULL){
-
-   # extract (X,Y,Z) from inputted data
-   X <- data$X; Y <- data$Y; Z <- data$Z
+fit_models <- function(X, Y, Z,
+                       family,
+                       method = list(XZ = 'glm', YZ = 'glm'),
+                       fitted.own = list(XZ = NULL, YZ = NULL)){
 
    # fit X on Z regression
    X_on_Z_fit_vals <- fit_single_model(V = X, Z = Z,
-                                       V_on_Z_fam = X_on_Z_fam,
-                                       fitting_V_on_Z = fitting_X_on_Z,
-                                       fit_vals_V_on_Z_own = fit_vals_X_on_Z_own)
+                                       V_on_Z_fam = family$XZ,
+                                       fitting_V_on_Z = method$XZ,
+                                       fit_vals_V_on_Z_own = fitted.own$XZ)
 
    # fit Y on Z regression
    Y_on_Z_fit_vals <- fit_single_model(V = Y, Z = Z,
-                                       V_on_Z_fam = Y_on_Z_fam,
-                                       fitting_V_on_Z = fitting_Y_on_Z,
-                                       fit_vals_V_on_Z_own = fit_vals_Y_on_Z_own)
+                                       V_on_Z_fam = family$YZ,
+                                       fitting_V_on_Z = method$YZ,
+                                       fit_vals_V_on_Z_own = fitted.own$YZ)
 
    return(list(X_on_Z_fit_vals = X_on_Z_fit_vals,
                Y_on_Z_fit_vals = Y_on_Z_fit_vals))
 }
-
 
 
 ############################################################################################
