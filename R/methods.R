@@ -3,8 +3,12 @@
 #'
 #' \code{GCM} is a function carrying out the GCM test based on GLMs for `X|Z` and `Y|Z`.
 #'
-#' @param data A (non-empty) named list with fields \code{X} (an nx1 vector for the predictor
-#' variable of interest), \code{Y} (an nx1 response vector), and \code{Z} (an nxp matrix of covariates).
+#' @param X
+#'   Numeric vector of length n for the predictor variable.
+#' @param Y
+#'   Numeric vector of length n for the response variable.
+#' @param Z
+#'   Numeric matrix (n × p) of covariates.
 #' @param X_on_Z_fam The GLM family for the regression of X on Z
 #' (values can be \code{binomial}, or \code{poisson}).
 #' @param Y_on_Z_fam The GLM family for the regression of Y on Z
@@ -40,7 +44,7 @@
 #'     fitting_Y_on_Z = 'glm')
 #'
 #' @export
-GCM <- function(data,
+GCM <- function(X, Y, Z,
                 X_on_Z_fam, Y_on_Z_fam,
                 fitting_X_on_Z = 'glm',
                 fitting_Y_on_Z = 'glm',
@@ -48,9 +52,9 @@ GCM <- function(data,
                 fit_vals_Y_on_Z_own = NULL,
                 alternative = 'two.sided') {
 
-  # extract (X,Y,Z) from inputted data
-  X <- data$X; Y <- data$Y; Z <- data$Z
   n <- length(X)
+
+  data <- list(X = X, Y = Y, Z = Z)
 
   fitted_vals <- fit_models(data = data,
                             X_on_Z_fam = X_on_Z_fam,
@@ -115,7 +119,7 @@ GCM <- function(data,
 #'      B = 2000)
 #'
 #' @export
-dCRT <- function(data,
+dCRT <- function(X, Y, Z,
                  X_on_Z_fam, Y_on_Z_fam,
                  fitting_X_on_Z = 'glm',
                  fitting_Y_on_Z = 'glm',
@@ -124,9 +128,9 @@ dCRT <- function(data,
                  alternative = 'two.sided',
                  B = 2000) {
 
-  # extract (X,Y,Z) from inputted data
-  X <- data$X; Y <- data$Y; Z <- data$Z
   n <- length(X)
+
+  data <- list(X = X, Y = Y, Z = Z)
 
   fitted_vals <- fit_models(data = data,
                             X_on_Z_fam = X_on_Z_fam,
@@ -225,13 +229,15 @@ dCRT <- function(data,
 #'        fit_vals_Y_on_Z_own = predicted)
 #'
 #' @export
-spaCRT <- function(data,
+spaCRT <- function(X, Y, Z,
                    X_on_Z_fam, Y_on_Z_fam,
                    fitting_X_on_Z = 'glm',
                    fitting_Y_on_Z = 'glm',
                    fit_vals_X_on_Z_own = NULL,
                    fit_vals_Y_on_Z_own = NULL,
                    alternative = 'two.sided') {
+
+  data <- list(X = X, Y = Y, Z = Z)
 
   fitted_vals <- fit_models(data = data,
                             X_on_Z_fam = X_on_Z_fam,
@@ -241,7 +247,7 @@ spaCRT <- function(data,
                             fit_vals_X_on_Z_own = fit_vals_X_on_Z_own,
                             fit_vals_Y_on_Z_own = fit_vals_Y_on_Z_own) |> suppressWarnings()
 
-  spa_result <- spa_cdf(X = data$X, Y = data$Y,
+  spa_result <- spa_cdf(X = X, Y = Y,
                         X_on_Z_fit_vals = fitted_vals$X_on_Z_fit_vals,
                         Y_on_Z_fit_vals = fitted_vals$Y_on_Z_fit_vals,
                         fam = X_on_Z_fam,
