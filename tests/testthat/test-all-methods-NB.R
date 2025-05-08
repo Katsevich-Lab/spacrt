@@ -29,8 +29,7 @@ data <- generate_data_nb(n, gamma_0, gamma_1,
 X <- data$X; Y <- data$Y; Z <- data$Z
 
 X_on_Z_fam <- "binomial"; Y_on_Z_fam <- "negative.binomial"
-fitting_X_on_Z <- 'rf'; fitting_Y_on_Z <- 'glm'
-
+fitting_X_on_Z <- 'glm'; fitting_Y_on_Z <- 'glm'
 
 results_GCM <- GCM(X, Y, Z,
                    family = list(XZ = X_on_Z_fam, YZ = Y_on_Z_fam),
@@ -51,9 +50,9 @@ results_p_value <- c(results_GCM$p_value, results_dCRT$p_value, results_spaCRT$p
 
 test_that("All test statistics and p-values were accurately computed.",{
   expect_equal(object = results_test_stat |> round(5),
-               expected = c(2.04561, 0.53143, 0.53400))
+               expected = c(1.96494, 0.50574, 0.50574))
   expect_equal(object = results_p_value |> unname() |> round(6),
-               expected = c(0.040795, 0.008799, 0.007898))
+               expected = c(0.049422, 0.008799, 0.011246 ))
   expect_equal(object = results_spaCRT$spa.success,
                expected = TRUE)
 })
