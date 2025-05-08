@@ -4,20 +4,20 @@
 #' \code{GCM} is a function carrying out the GCM test based on GLMs for `X|Z` and `Y|Z`.
 #'
 #' @param X
-#'   Numeric vector of length n for the predictor variable.
+#'   Numeric vector of length \eqn{n}, representing the predictor variable.
 #' @param Y
-#'   Numeric vector of length n for the response variable.
+#'   Numeric vector of length \eqn{n}, representing the response variable.
 #' @param Z
-#'   Numeric matrix (n × p) of covariates.
+#'   Numeric matrix with \eqn{n} rows and \eqn{p} columns, representing covariates.
 #' @param family
-#'   Named list with elements `XZ` and `YZ` specifying the distribution or loss
-#'   (e.g. `"binomial"`, `"poisson"`) for each model.
-#'   Ignored for any model where you supply your own fitted values via `fitted.own`.
+#'   Named list with elements `XZ` and `YZ` specifying the model family for \eqn{X \mid Z} and
+#'   \eqn{Y \mid Z} for each model. Each list element must be a string (e.g. `"binomial"`,
+#'   `"poisson"`). Ignored for any model where you supply your own fitted values via `fitted.ext`.
 #' @param method
-#'   Named list with elements `XZ` and `YZ` that selects the fitting engine
-#'   for each model. Each element must be a string (e.g. `"glm"`, `"rf"`).
-#'   Ignored for any model where you supply your own fitted values via `fitted.own`.
-#' @param fitted.own
+#'   Named list with elements `XZ` and `YZ` that selects the model-fitting method to use
+#'   for each model. Each element must be a string (e.g. `"glm"`, `"rf"`, `"prob_forest"`).
+#'   Ignored for any model where you supply your own fitted values via `fitted.ext`.
+#' @param fitted.ext
 #'   Named list with elements `XZ` and `YZ` of user-supplied fitted values
 #'   (numeric vectors of length n). For each non-NULL element, that model is
 #'   treated as custom and neither `method` nor `family` is used.
@@ -33,22 +33,40 @@
 #' }
 #'
 #' @examples
-#' n <- 20; p <- 2
-#' data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
-#'              Y = rpois(n = n, lambda = 1),
-#'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
-#' X_on_Z_fam <- "binomial"
-#' Y_on_Z_fam <- "poisson"
-#' GCM(data, X_on_Z_fam, Y_on_Z_fam,
-#'     fitting_X_on_Z = 'rf',
-#'     fitting_Y_on_Z = 'glm')
+#' n <- 200; p <- 4
+#' set.seed(1234)
+#' X <- rbinom(n = n, size = 1, prob = 0.3)
+#' Y <- rpois(n = n, lambda = 1)
+#' Z <- matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p)
 #'
+#' # fit both models via GLM
+#' res.GCM.1 <- GCM(X = X, Y = Y, Z = Z,
+#'                  family = list(XZ = "binomial", YZ = "poisson"),
+#'                  method = list(XZ = "glm", YZ = "glm"))
+#' res.GCM.1
+#'
+#' # custom fit for Y|Z, explicit method/family only for X|Z
+#' user_fit_Y <- glm(Y ~ Z,
+#'                   family = poisson(),
+#'                   data = data.frame(Y = Y, Z = Z))$fitted.values |> unname()
+#'
+#' res.GCM.2 <- GCM(X = X, Y = Y, Z = Z,
+#'                  method = list(XZ = "rf"),
+#'                  family = list(XZ = "binomial"),
+#'                  fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
+#'                  alternative = "greater")
+#' res.GCM.2
 #' @export
 GCM <- function(X, Y, Z,
                 family,
                 method = list(XZ = 'glm', YZ = 'glm'),
-                fitted.own = list(XZ = NULL, YZ = NULL),
+                fitted.ext = list(XZ = NULL, YZ = NULL),
                 alternative = 'two.sided') {
+
+  check_inputs_main(X, Y, Z,
+                    family, method, fitted.ext,
+                    alternative,
+                    func = 'GCM')
 
   n <- length(X)
 
@@ -57,8 +75,8 @@ GCM <- function(X, Y, Z,
                                           YZ = family$YZ),
                             method = list(XZ = method$XZ,
                                           YZ = method$YZ),
-                            fitted.own = list(XZ = fitted.own$XZ,
-                                              YZ = fitted.own$XZ)) |> suppressWarnings()
+                            fitted.ext = list(XZ = fitted.ext$XZ,
+                                              YZ = fitted.ext$YZ)) |> suppressWarnings()
 
   X_on_Z_fit_vals <- fitted_vals$X_on_Z_fit_vals
   Y_on_Z_fit_vals <- fitted_vals$Y_on_Z_fit_vals
@@ -102,25 +120,41 @@ GCM <- function(X, Y, Z,
 #' }
 #'
 #' @examples
-#' n <- 80; p <- 2; B <- 100
-#' data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
-#'              Y = rpois(n = n, lambda = 1),
-#'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
-#' X_on_Z_fam <- "binomial"
-#' Y_on_Z_fam <- "poisson"
+#' n <- 200; p <- 4
+#' set.seed(1234)
+#' X <- rbinom(n = n, size = 1, prob = 0.3)
+#' Y <- rpois(n = n, lambda = 1)
+#' Z <- matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p)
 #'
-#' dCRT(data, X_on_Z_fam, Y_on_Z_fam,
-#'      fitting_X_on_Z = 'rf',
-#'      fitting_Y_on_Z = 'glm',
-#'      B = 2000)
+#' # fit both models via GLM
+#' res.dCRT.1 <- dCRT(X = X, Y = Y, Z = Z,
+#'                    family = list(XZ = "binomial", YZ = "poisson"),
+#'                    method = list(XZ = "glm", YZ = "glm"))
+#' res.dCRT.1
 #'
+#' # custom fit for Y|Z, explicit method/family only for X|Z
+#' user_fit_Y <- glm(Y ~ Z,
+#'                   family = poisson(),
+#'                   data = data.frame(Y = Y, Z = Z))$fitted.values |> unname()
+#'
+#' res.dCRT.2 <- dCRT(X = X, Y = Y, Z = Z,
+#'                    method = list(XZ = "rf"),
+#'                    family = list(XZ = "binomial"),
+#'                    fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
+#'                    alternative = "greater")
+#' res.dCRT.2
 #' @export
 dCRT <- function(X, Y, Z,
                  family,
                  method = list(XZ = 'glm', YZ = 'glm'),
-                 fitted.own = list(XZ = NULL, YZ = NULL),
+                 fitted.ext = list(XZ = NULL, YZ = NULL),
                  alternative = 'two.sided',
-                 B = 2000) {
+                 B = 5000) {
+
+  check_inputs_main(X, Y, Z,
+                    family, method, fitted.ext,
+                    alternative,
+                    func = 'dCRT', B)
 
   n <- length(X)
 
@@ -129,8 +163,8 @@ dCRT <- function(X, Y, Z,
                                           YZ = family$YZ),
                             method = list(XZ = method$XZ,
                                           YZ = method$YZ),
-                            fitted.own = list(XZ = fitted.own$XZ,
-                                              YZ = fitted.own$XZ)) |> suppressWarnings()
+                            fitted.ext = list(XZ = fitted.ext$XZ,
+                                              YZ = fitted.ext$YZ)) |> suppressWarnings()
 
   X_on_Z_fit_vals <- fitted_vals$X_on_Z_fit_vals
   Y_on_Z_fit_vals <- fitted_vals$Y_on_Z_fit_vals
@@ -188,52 +222,51 @@ dCRT <- function(X, Y, Z,
 #' }
 #'
 #' @examples
-#' ## Example 1
-#' n <- 50; p <- 4
-#' data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
-#'              Y = rpois(n = n, lambda = 1),
-#'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
-#' X_on_Z_fam <- "binomial"
-#' Y_on_Z_fam <- "poisson"
+#' n <- 200; p <- 4
+#' set.seed(1234)
+#' X <- rbinom(n = n, size = 1, prob = 0.3)
+#' Y <- rpois(n = n, lambda = 1)
+#' Z <- matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p)
 #'
-#' spaCRT(data, X_on_Z_fam, Y_on_Z_fam,
-#'        fitting_X_on_Z = 'rf',
-#'        fitting_Y_on_Z = 'glm',
-#'        alternative = 'greater')
+#' # fit both models via GLM
+#' res.spaCRT.1 <- spaCRT(X = X, Y = Y, Z = Z,
+#'                        family = list(XZ = "binomial", YZ = "poisson"),
+#'                        method = list(XZ = "glm", YZ = "glm"))
+#' res.spaCRT.1
 #'
-#' ## Example 2
-#' n <- 100; p <- 10
-#' data <- list(X = rbinom(n = n, size = 1, prob = 0.7),
-#'              Y = rbinom(n = n, size = 1, prob = 0.2),
-#'              Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
-#' X_on_Z_fam <- "binomial"
-#' Y_on_Z_fam <- "binomial"
-#'
-#' dtrain <- xgboost::xgb.DMatrix(data = data$Z, label = data$Y)
+#' # custom fit for Y|Z, explicit method/family only for X|Z
+#' dtrain <- xgboost::xgb.DMatrix(data = Z, label = Y)
 #' model.Y <- xgboost::xgboost(data = dtrain,
-#'                             objective = "binary:logistic",
+#'                             objective = "count:poisson",
 #'                             nrounds = 50, verbose = 0)
-#' predicted <- stats::predict(model.Y, newdata = data$Z)
+#' user_fit_Y <- stats::predict(model.Y, newdata = Z)
 #'
-#' spaCRT(data, X_on_Z_fam, Y_on_Z_fam,
-#'        fitting_X_on_Z = 'glm',
-#'        fitting_Y_on_Z = 'own',
-#'        fit_vals_Y_on_Z_own = predicted)
+#' res.spaCRT.2 <- spaCRT(X = X, Y = Y, Z = Z,
+#'                        method = list(XZ = "rf"),
+#'                        family = list(XZ = "binomial"),
+#'                        fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
+#'                        alternative = "greater")
+#' res.spaCRT.2
 #'
 #' @export
 spaCRT <- function(X, Y, Z,
                    family,
                    method = list(XZ = 'glm', YZ = 'glm'),
-                   fitted.own = list(XZ = NULL, YZ = NULL),
+                   fitted.ext = list(XZ = NULL, YZ = NULL),
                    alternative = 'two.sided') {
+
+  check_inputs_main(X, Y, Z,
+                    family, method, fitted.ext,
+                    alternative,
+                    func = 'spaCRT')
 
   fitted_vals <- fit_models(X, Y, Z,
                             family = list(XZ = family$XZ,
                                           YZ = family$YZ),
                             method = list(XZ = method$XZ,
                                           YZ = method$YZ),
-                            fitted.own = list(XZ = fitted.own$XZ,
-                                              YZ = fitted.own$XZ)) |> suppressWarnings()
+                            fitted.ext = list(XZ = fitted.ext$XZ,
+                                              YZ = fitted.ext$YZ)) |> suppressWarnings()
 
   spa_result <- spa_cdf(X = X, Y = Y,
                         X_on_Z_fit_vals = fitted_vals$X_on_Z_fit_vals,
@@ -259,10 +292,4 @@ spaCRT <- function(X, Y, Z,
 }
 
 
-
-
-
-
-
 # spacrt - methods.R
-
