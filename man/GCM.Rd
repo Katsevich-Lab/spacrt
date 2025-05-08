@@ -5,41 +5,36 @@
 \title{The generalized covariance measure test of Shah and Peters.}
 \usage{
 GCM(
-  data,
-  X_on_Z_fam,
-  Y_on_Z_fam,
-  fitting_X_on_Z = "glm",
-  fitting_Y_on_Z = "glm",
-  fit_vals_X_on_Z_own = NULL,
-  fit_vals_Y_on_Z_own = NULL,
+  X,
+  Y,
+  Z,
+  family,
+  method = list(XZ = "glm", YZ = "glm"),
+  fitted.ext = list(XZ = NULL, YZ = NULL),
   alternative = "two.sided"
 )
 }
 \arguments{
-\item{data}{A (non-empty) named list with fields \code{X} (an nx1 vector for the predictor
-variable of interest), \code{Y} (an nx1 response vector), and \code{Z} (an nxp matrix of covariates).}
+\item{X}{Numeric vector of length \eqn{n}, representing the predictor variable.}
 
-\item{X_on_Z_fam}{The GLM family for the regression of X on Z
-(values can be \code{binomial}, or \code{poisson}).}
+\item{Y}{Numeric vector of length \eqn{n}, representing the response variable.}
 
-\item{Y_on_Z_fam}{The GLM family for the regression of Y on Z
-(values can be \code{binomial}, \code{poisson}, or \code{negative.binomial}).}
+\item{Z}{Numeric matrix with \eqn{n} rows and \eqn{p} columns, representing covariates.}
 
-\item{fitting_X_on_Z}{The fitting method for the regression X on Z
-(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).}
+\item{family}{Named list with elements \code{XZ} and \code{YZ} specifying the model family for \eqn{X \mid Z} and
+\eqn{Y \mid Z} for each model. Each list element must be a string (e.g. \code{"binomial"},
+\code{"poisson"}). Ignored for any model where you supply your own fitted values via \code{fitted.ext}.}
 
-\item{fitting_Y_on_Z}{The fitting method for the regression Y on Z
-(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).}
+\item{method}{Named list with elements \code{XZ} and \code{YZ} that selects the model-fitting method to use
+for each model. Each element must be a string (e.g. \code{"glm"}, \code{"rf"}, \code{"prob_forest"}).
+Ignored for any model where you supply your own fitted values via \code{fitted.ext}.}
 
-\item{fit_vals_X_on_Z_own}{Vector of fitted values for X on Z in case the user's custom method.
-Works only if fitting_X_on_Z = 'own'.}
+\item{fitted.ext}{Named list with elements \code{XZ} and \code{YZ} of user-supplied fitted values
+(numeric vectors of length n). For each non-NULL element, that model is
+treated as custom and neither \code{method} nor \code{family} is used.}
 
-\item{fit_vals_Y_on_Z_own}{Vector of fitted values for Y on Z in case the user's custom method.
-Works only if fitting_Y_on_Z = 'own'.}
-
-\item{alternative}{A character string specifying the alternative hypothesis
-(values can be "two.sided" (default), "greater", or "less"; meant for both-sided, right-sided,
-and left-sided p-values, respectively).}
+\item{alternative}{A character string specifying the alternative hypothesis for the test.
+Values can be "two.sided" (default), "greater", or "less".}
 }
 \value{
 A named list containing the following fields:
@@ -52,14 +47,27 @@ A named list containing the following fields:
 \code{GCM} is a function carrying out the GCM test based on GLMs for \code{X|Z} and \code{Y|Z}.
 }
 \examples{
-n <- 20; p <- 2
-data <- list(X = rbinom(n = n, size = 1, prob = 0.2),
-             Y = rpois(n = n, lambda = 1),
-             Z = matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p))
-X_on_Z_fam <- "binomial"
-Y_on_Z_fam <- "poisson"
-GCM(data, X_on_Z_fam, Y_on_Z_fam,
-    fitting_X_on_Z = 'rf',
-    fitting_Y_on_Z = 'glm')
+n <- 200; p <- 4
+set.seed(1234)
+X <- rbinom(n = n, size = 1, prob = 0.3)
+Y <- rpois(n = n, lambda = 1)
+Z <- matrix(rnorm(n = n*p, mean = 0, sd = 1), nrow = n, ncol = p)
 
+# fit both models via GLM
+res.GCM.1 <- GCM(X = X, Y = Y, Z = Z,
+                 family = list(XZ = "binomial", YZ = "poisson"),
+                 method = list(XZ = "glm", YZ = "glm"))
+res.GCM.1
+
+# custom fit for Y|Z, explicit method/family only for X|Z
+user_fit_Y <- glm(Y ~ Z,
+                  family = poisson(),
+                  data = data.frame(Y = Y, Z = Z))$fitted.values |> unname()
+
+res.GCM.2 <- GCM(X = X, Y = Y, Z = Z,
+                 method = list(XZ = "rf"),
+                 family = list(XZ = "binomial"),
+                 fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
+                 alternative = "greater")
+res.GCM.2
 }
