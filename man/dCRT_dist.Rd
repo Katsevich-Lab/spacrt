@@ -8,7 +8,7 @@ distribution depending on a specified  GLM family}
 dCRT_dist(n, fitted.val, fam)
 }
 \arguments{
-\item{n}{The point where the CGF will be computed.}
+\item{n}{Number of samples}
 
 \item{fitted.val}{A vector containing the fitted parameter values by
 fitting a GLM to X on Z.}

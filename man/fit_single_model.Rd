@@ -5,13 +5,7 @@
 \title{\code{fit_single_model} is a function carrying out a single regression \code{V} on \code{Z}, where
 \code{V} is the variable/response and \code{Z} is the covariate.}
 \usage{
-fit_single_model(
-  V,
-  Z,
-  V_on_Z_fam,
-  fitting_V_on_Z = "glm",
-  fit_vals_V_on_Z_own = NULL
-)
+fit_single_model(V, Z, V_on_Z_fam, fitting_V_on_Z, fit_vals_V_on_Z_own)
 }
 \arguments{
 \item{V}{Vector of variable/response.}

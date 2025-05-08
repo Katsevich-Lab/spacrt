@@ -7,9 +7,9 @@
 spa_cdf(X, Y, X_on_Z_fit_vals, Y_on_Z_fit_vals, fam, R = 5)
 }
 \arguments{
-\item{X}{X}
+\item{X}{Numeric vector of length n for the predictor variable.}
 
-\item{Y}{Y.}
+\item{Y}{Numeric vector of length n for the response variable.}
 
 \item{X_on_Z_fit_vals}{X_on_Z_fit$fitted.values}
 
