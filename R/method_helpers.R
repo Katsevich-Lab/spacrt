@@ -104,7 +104,7 @@ spa_cdf <- function(X, Y,
 #' \code{dCRT_dist} is a function that returns simulated data from an appropriate
 #' distribution depending on a specified  GLM family
 #'
-#' @param n
+#' @param n Number of samples
 #' @param fitted.val A vector containing the fitted parameter values by
 #' fitting a GLM to X on Z.
 #' @param fam The GLM family which includes the distribution whose CGF is being
@@ -274,19 +274,19 @@ nb_precomp <- function(V,Z){
 fit_models <- function(X, Y, Z,
                        family,
                        method = list(XZ = 'glm', YZ = 'glm'),
-                       fitted.own = list(XZ = NULL, YZ = NULL)){
+                       fitted.ext = list(XZ = NULL, YZ = NULL)){
 
    # fit X on Z regression
    X_on_Z_fit_vals <- fit_single_model(V = X, Z = Z,
                                        V_on_Z_fam = family$XZ,
                                        fitting_V_on_Z = method$XZ,
-                                       fit_vals_V_on_Z_own = fitted.own$XZ)
+                                       fit_vals_V_on_Z_own = fitted.ext$XZ)
 
    # fit Y on Z regression
    Y_on_Z_fit_vals <- fit_single_model(V = Y, Z = Z,
                                        V_on_Z_fam = family$YZ,
                                        fitting_V_on_Z = method$YZ,
-                                       fit_vals_V_on_Z_own = fitted.own$YZ)
+                                       fit_vals_V_on_Z_own = fitted.ext$YZ)
 
    return(list(X_on_Z_fit_vals = X_on_Z_fit_vals,
                Y_on_Z_fit_vals = Y_on_Z_fit_vals))
@@ -311,34 +311,50 @@ fit_models <- function(X, Y, Z,
 #' @keywords internal
 fit_single_model <- function(V, Z,
                              V_on_Z_fam,
-                             fitting_V_on_Z = 'glm',
-                             fit_vals_V_on_Z_own = NULL){
+                             fitting_V_on_Z,
+                             fit_vals_V_on_Z_own){
 
-  if(fitting_V_on_Z == 'glm'){
-    # fit V on Z regression when fitting method is glm
-    if(V_on_Z_fam == "negative.binomial"){
-      aux_info_V_on_Z <- nb_precomp(V = V, Z = Z)
+  if(!is.null(fitting_V_on_Z)){
+    if(fitting_V_on_Z == 'glm'){
+      # fit V on Z regression when fitting method is glm
+      if(V_on_Z_fam == "negative.binomial"){
+        # V_on_Z_fam == "negative.binomial"
+        aux_info_V_on_Z <- nb_precomp(V = V, Z = Z)
 
-      V_on_Z_fit <- stats::glm(V ~ Z,
-                               family = MASS::negative.binomial(aux_info_V_on_Z$theta_hat),
-                               mustart = aux_info_V_on_Z$fitted_values) |> suppressWarnings()
+        V_on_Z_fit <- stats::glm(V ~ Z,
+                                 family = MASS::negative.binomial(aux_info_V_on_Z$theta_hat),
+                                 mustart = aux_info_V_on_Z$fitted_values) |> suppressWarnings()
 
-      V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
-    } else{
-      V_on_Z_fit <- suppressWarnings(stats::glm(V ~ Z, family = V_on_Z_fam))
-      V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
+        V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
+      } else{
+        # V_on_Z_fam == any other glm family
+        V_on_Z_fit <- suppressWarnings(stats::glm(V ~ Z, family = V_on_Z_fam))
+        V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
+      }
+    } else if(fitting_V_on_Z %in% c('rf','prob_forest')){
+      # fit V on Z regression when fitting method is random forest
+      Z <- as.data.frame(Z)
+      colnames(Z) <- paste0("V", seq_len(ncol(Z)))
+
+      discrete_fam <- c('binomial','poisson','negative.binomial')
+
+      if(V_on_Z_fam %in% discrete_fam){
+        # V_on_Z_fam is discrete
+        rf_fit <- ranger::ranger(y = as.factor(V), x = Z, probability = TRUE)
+        pred_probs <- stats::predict(rf_fit, data = Z)$predictions
+
+        # Extract probability for class "1" if present; otherwise use first level
+        target_class <- if("1" %in% colnames(pred_probs)) "1" else colnames(pred_probs)[1]
+        V_on_Z_fit_vals <- pred_probs[, target_class]
+      } else{
+        # V_on_Z_fam is continuous
+        rf_fit <- ranger::ranger(y = V, x = Z)
+        V_on_Z_fit_vals <- stats::predict(rf_fit, data = Z)$predictions
+      }
     }
-  } else if(fitting_V_on_Z %in% c('rf','prob_forest')){
-    # fit V on Z regression when fitting method is random forest
-    if(V_on_Z_fam == "binomial"){
-      p.forest.V <- grf::probability_forest(X = as.matrix(Z), Y = as.factor(V))
-      p.hat.V <- stats::predict(p.forest.V, as.matrix(Z), estimate.variance = F)
-
-      V_on_Z_fit_vals <- p.hat.V$predictions[ ,"1"]
-    }
-  } else if(fitting_V_on_Z == 'own') {
+  } else{
     # Validate that fit_vals_V_on_Z_own is provided and contains necessary components
-    if(!is.numeric(fit_vals_V_on_Z_own)) {
+    if(!is.numeric(fit_vals_V_on_Z_own)){
       stop("fit_vals_V_on_Z_own must be a vector containing 'V_on_Z_fit_vals' when using fitting_V_on_Z = 'own'")
     }
 
@@ -349,7 +365,98 @@ fit_single_model <- function(V, Z,
   return(V_on_Z_fit_vals)
 }
 
+############################################################################################
+#' Validate inputs to the GCM function
+#'
+#' \code{check_inputs_main} is a utility function that checks whether the arguments provided to
+#' \code{GCM()}, \code{dCRT()} and \code{spaCRT()} satisfy the required structure and types.
+#'
+#' @param X Numeric vector of length \eqn{n}, representing the predictor variable.
+#' @param Y Numeric vector of length \eqn{n}, representing the response variable.
+#' @param Z Numeric matrix with \eqn{n} rows and \eqn{p} columns, representing covariates.
+#' @param family Named list with elements \code{XZ} and \code{YZ}, each a character string
+#'   specifying the model family for \eqn{X \mid Z} and \eqn{Y \mid Z}, respectively.
+#' @param method Named list with elements \code{XZ} and \code{YZ}, each a character string
+#'   indicating the model-fitting method to use, e.g., \code{"glm"}, \code{"rf"}.
+#' @param fitted.ext Named list with elements \code{XZ} and \code{YZ}, each either \code{NULL}
+#'   or a numeric vector of length \eqn{n} representing user-supplied fitted values.
+#' @param alternative Character string indicating the alternative hypothesis for the test.
+#'   Must be one of \code{"two.sided"}, \code{"greater"}, or \code{"less"}.
+#'
+#' @return None. The function throws an error if any check fails.
+#'
+#' @keywords internal
+check_inputs_main <- function(X, Y, Z,
+                              family, method,
+                              fitted.ext,
+                              alternative,
+                              func = 'GCM', B = NULL) {
+  n <- length(X)
 
+  # Check X
+  if(!is.numeric(X) || !is.vector(X)) stop("`X` must be a numeric vector.")
+
+  # Check Y
+  if(!is.numeric(Y) || !is.vector(Y)) stop("`Y` must be a numeric vector.")
+  if(length(Y) != n) stop("`X` and `Y` must be of the same length.")
+
+  # Check Z
+  if(!is.matrix(Z) || !is.numeric(Z)) stop("`Z` must be a numeric matrix.")
+  if(nrow(Z) != n) stop("`Z` must have the same number of rows as `X` and `Y`.")
+
+  # Check fitted.ext
+  if (!is.list(fitted.ext) || !setequal(names(fitted.ext), c("XZ", "YZ"))) {
+    stop("`fitted.ext` must be a named list with exactly two elements: 'XZ' and 'YZ'.")
+  }
+  for (name in c("XZ", "YZ")) {
+    val <- fitted.ext[[name]]
+    if (!is.null(val)) {
+      if (!is.numeric(val) || !is.vector(val) || length(val) != n)
+        stop(sprintf("`fitted.ext$%s` must be NULL or a numeric vector of length %d.", name, n))
+    }
+  }
+
+  # Check family
+  if(!is.list(family)) stop("`family` must be a named list.")
+
+  for (name in c("XZ", "YZ")) {
+    if (is.null(fitted.ext[[name]])) {
+      # Must be provided and valid
+      if (!(name %in% names(family)))
+        stop(sprintf("`family` must include a character entry for '%s' if `fitted.ext$%s` is NULL.", name, name))
+      family_val <- family[[name]]
+      if (!is.character(family_val) || length(family_val) != 1)
+        stop(sprintf("`family$%s` must be a character string.", name))
+    }
+  }
+
+  # Check method
+  if(!is.list(method)) stop("`method` must be a named list.")
+
+  for (name in c("XZ", "YZ")) {
+    if (is.null(fitted.ext[[name]])) {
+      # Must be provided and valid
+      if (!(name %in% names(method)))
+        stop(sprintf("`method` must include a character entry for '%s' if `fitted.ext$%s` is NULL.", name, name))
+      method_val <- method[[name]]
+      if (!is.character(method_val) || length(method_val) != 1)
+        stop(sprintf("`method$%s` must be a character string.", name))
+    }
+  }
+
+  # Check alternative
+  if(!alternative %in% c("two.sided", "greater", "less"))
+    stop("`alternative` must be one of 'two.sided', 'greater', or 'less'.")
+
+  # Special check for dCRT
+  if (func == 'dCRT') {
+    if (!is.numeric(B) || length(B) != 1 || B <= 0 || B != as.integer(B)) {
+      stop("`B` must be a positive integer.")
+    }
+  }
+
+  return(invisible(NULL))
+}
 
 
 # spacrt - method_helpers.R
