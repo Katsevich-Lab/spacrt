@@ -238,7 +238,7 @@ dCRT <- function(X, Y, Z,
 #' dtrain <- xgboost::xgb.DMatrix(data = Z, label = Y)
 #' model.Y <- xgboost::xgboost(data = dtrain,
 #'                             objective = "count:poisson",
-#'                             nrounds = 50, verbose = 0)
+#'                             nrounds = 100, verbose = 0)
 #' user_fit_Y <- stats::predict(model.Y, newdata = Z)
 #'
 #' res.spaCRT.2 <- spaCRT(X = X, Y = Y, Z = Z,
