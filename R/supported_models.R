@@ -43,7 +43,7 @@
 #'
 #' @name supported_models
 #' @aliases supported_models
-#' @title Supported Model Families and Fitting Methods for Inference
+#' @title Supported Model Families and Model-fitting Methods for Inference
 #' @keywords documentation
 #' @seealso \code{\link{GCM}}, \code{\link{dCRT}}, \code{\link{spaCRT}}
 NULL

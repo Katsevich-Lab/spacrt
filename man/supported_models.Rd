@@ -2,7 +2,7 @@
 % Please edit documentation in R/supported_models.R
 \name{supported_models}
 \alias{supported_models}
-\title{Supported Model Families and Fitting Methods for Inference}
+\title{Supported Model Families and Model-fitting Methods for Inference}
 \description{
 Supported Families and Model-fitting Methods
 }
