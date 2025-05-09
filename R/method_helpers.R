@@ -272,19 +272,19 @@ nb_precomp <- function(V,Z){
 fit_models <- function(X, Y, Z,
                        family,
                        method = list(XZ = 'glm', YZ = 'glm'),
-                       fitted.ext = list(XZ = NULL, YZ = NULL)){
+                       fitted = list(XZ = NULL, YZ = NULL)){
 
    # fit X on Z regression
    X_on_Z_fit_vals <- fit_single_model(V = X, Z = Z,
                                        V_on_Z_fam = family$XZ,
                                        fitting_V_on_Z = method$XZ,
-                                       fit_vals_V_on_Z_own = fitted.ext$XZ)
+                                       fit_vals_V_on_Z_own = fitted$XZ)
 
    # fit Y on Z regression
    Y_on_Z_fit_vals <- fit_single_model(V = Y, Z = Z,
                                        V_on_Z_fam = family$YZ,
                                        fitting_V_on_Z = method$YZ,
-                                       fit_vals_V_on_Z_own = fitted.ext$YZ)
+                                       fit_vals_V_on_Z_own = fitted$YZ)
 
    return(list(X_on_Z_fit_vals = X_on_Z_fit_vals,
                Y_on_Z_fit_vals = Y_on_Z_fit_vals))
@@ -376,7 +376,7 @@ fit_single_model <- function(V, Z,
 #'   specifying the model family for \eqn{X \mid Z} and \eqn{Y \mid Z}, respectively.
 #' @param method Named list with elements \code{XZ} and \code{YZ}, each a character string
 #'   indicating the model-fitting method to use, e.g., \code{"glm"}, \code{"random_forest"}.
-#' @param fitted.ext Named list with elements \code{XZ} and \code{YZ}, each either \code{NULL}
+#' @param fitted Named list with elements \code{XZ} and \code{YZ}, each either \code{NULL}
 #'   or a numeric vector of length \eqn{n} representing user-supplied fitted values.
 #' @param alternative Character string indicating the alternative hypothesis for the test.
 #'   Must be one of \code{"two.sided"}, \code{"greater"}, or \code{"less"}.
@@ -386,7 +386,7 @@ fit_single_model <- function(V, Z,
 #' @keywords internal
 check_inputs_main <- function(X, Y, Z,
                               family, method,
-                              fitted.ext,
+                              fitted,
                               alternative,
                               func = 'GCM', B = NULL) {
   n <- length(X)
@@ -406,15 +406,15 @@ check_inputs_main <- function(X, Y, Z,
   supported_families <- c("binomial", "poisson","negative.binomial")
   supported_methods  <- c("glm", "random_forest")
 
-  # Check fitted.ext
-  if (!is.list(fitted.ext) || !setequal(names(fitted.ext), c("XZ", "YZ"))) {
-    stop("`fitted.ext` must be a named list with exactly two elements: 'XZ' and 'YZ'.")
+  # Check fitted
+  if (!is.list(fitted) || !setequal(names(fitted), c("XZ", "YZ"))) {
+    stop("`fitted` must be a named list with exactly two elements: 'XZ' and 'YZ'.")
   }
   for (name in c("XZ", "YZ")) {
-    val <- fitted.ext[[name]]
+    val <- fitted[[name]]
     if (!is.null(val)) {
       if (!is.numeric(val) || !is.vector(val) || length(val) != n)
-        stop(sprintf("`fitted.ext$%s` must be NULL or a numeric vector of length %d.", name, n))
+        stop(sprintf("`fitted$%s` must be NULL or a numeric vector of length %d.", name, n))
     }
   }
 
@@ -422,10 +422,10 @@ check_inputs_main <- function(X, Y, Z,
   if(!is.list(family)) stop("`family` must be a named list.")
 
   for (name in c("XZ", "YZ")) {
-    if (is.null(fitted.ext[[name]])) {
+    if (is.null(fitted[[name]])) {
       # Must be provided and valid
       if (!(name %in% names(family)))
-        stop(sprintf("`family` must include a character entry for '%s' if `fitted.ext$%s` is NULL.", name, name))
+        stop(sprintf("`family` must include a character entry for '%s' if `fitted$%s` is NULL.", name, name))
       family_val <- family[[name]]
       if (!is.character(family_val) || length(family_val) != 1)
         stop(sprintf("`family$%s` must be a character string.", name))
@@ -438,10 +438,10 @@ check_inputs_main <- function(X, Y, Z,
   if(!is.list(method)) stop("`method` must be a named list.")
 
   for (name in c("XZ", "YZ")) {
-    if (is.null(fitted.ext[[name]])) {
+    if (is.null(fitted[[name]])) {
       # Must be provided and valid
       if (!(name %in% names(method)))
-        stop(sprintf("`method` must include a character entry for '%s' if `fitted.ext$%s` is NULL.", name, name))
+        stop(sprintf("`method` must include a character entry for '%s' if `fitted$%s` is NULL.", name, name))
       method_val <- method[[name]]
       if (!is.character(method_val) || length(method_val) != 1)
         stop(sprintf("`method$%s` must be a character string.", name))

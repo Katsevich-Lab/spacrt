@@ -10,7 +10,7 @@ check_inputs_main(
   Z,
   family,
   method,
-  fitted.ext,
+  fitted,
   alternative,
   func = "GCM",
   B = NULL
@@ -29,7 +29,7 @@ specifying the model family for \eqn{X \mid Z} and \eqn{Y \mid Z}, respectively.
 \item{method}{Named list with elements \code{XZ} and \code{YZ}, each a character string
 indicating the model-fitting method to use, e.g., \code{"glm"}, \code{"random_forest"}.}
 
-\item{fitted.ext}{Named list with elements \code{XZ} and \code{YZ}, each either \code{NULL}
+\item{fitted}{Named list with elements \code{XZ} and \code{YZ}, each either \code{NULL}
 or a numeric vector of length \eqn{n} representing user-supplied fitted values.}
 
 \item{alternative}{Character string indicating the alternative hypothesis for the test.

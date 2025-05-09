@@ -12,12 +12,12 @@
 #' @param family
 #'   Named list with elements `XZ` and `YZ` specifying the model family for \eqn{X \mid Z} and
 #'   \eqn{Y \mid Z} for each model. Each list element must be a string (e.g. `"binomial"`,
-#'   `"poisson"`). Ignored for any model where you supply your own fitted values via `fitted.ext`.
+#'   `"poisson"`). Ignored for any model where you supply your own fitted values via `fitted`.
 #' @param method
 #'   Named list with elements `XZ` and `YZ` that selects the model-fitting method to use
 #'   for each model. Each element must be a string (e.g. `"glm"`, `"random_forest"`).
-#'   Ignored for any model where you supply your own fitted values via `fitted.ext`.
-#' @param fitted.ext
+#'   Ignored for any model where you supply your own fitted values via `fitted`.
+#' @param fitted
 #'   Named list with elements `XZ` and `YZ` of user-supplied fitted values
 #'   (numeric vectors of length n). For each non-NULL element, that model is
 #'   treated as custom and neither `method` nor `family` is used.
@@ -53,7 +53,7 @@
 #' res.GCM.2 <- GCM(X = X, Y = Y, Z = Z,
 #'                  method = list(XZ = "random_forest"),
 #'                  family = list(XZ = "binomial"),
-#'                  fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
+#'                  fitted = list(XZ = NULL, YZ = user_fit_Y),
 #'                  alternative = "greater")
 #' res.GCM.2
 #'
@@ -61,11 +61,11 @@
 GCM <- function(X, Y, Z,
                 family,
                 method,
-                fitted.ext = list(XZ = NULL, YZ = NULL),
+                fitted = list(XZ = NULL, YZ = NULL),
                 alternative = 'two.sided') {
 
   check_inputs_main(X, Y, Z,
-                    family, method, fitted.ext,
+                    family, method, fitted,
                     alternative,
                     func = 'GCM')
 
@@ -76,8 +76,8 @@ GCM <- function(X, Y, Z,
                                           YZ = family$YZ),
                             method = list(XZ = method$XZ,
                                           YZ = method$YZ),
-                            fitted.ext = list(XZ = fitted.ext$XZ,
-                                              YZ = fitted.ext$YZ)) |> suppressWarnings()
+                            fitted = list(XZ = fitted$XZ,
+                                              YZ = fitted$YZ)) |> suppressWarnings()
 
   X_on_Z_fit_vals <- fitted_vals$X_on_Z_fit_vals
   Y_on_Z_fit_vals <- fitted_vals$Y_on_Z_fit_vals
@@ -141,7 +141,7 @@ GCM <- function(X, Y, Z,
 #' res.dCRT.2 <- dCRT(X = X, Y = Y, Z = Z,
 #'                    method = list(XZ = "random_forest"),
 #'                    family = list(XZ = "binomial"),
-#'                    fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
+#'                    fitted = list(XZ = NULL, YZ = user_fit_Y),
 #'                    alternative = "greater")
 #' res.dCRT.2
 #'
@@ -149,12 +149,12 @@ GCM <- function(X, Y, Z,
 dCRT <- function(X, Y, Z,
                  family,
                  method = list(XZ = 'glm', YZ = 'glm'),
-                 fitted.ext = list(XZ = NULL, YZ = NULL),
+                 fitted = list(XZ = NULL, YZ = NULL),
                  alternative = 'two.sided',
                  B = 5000) {
 
   check_inputs_main(X, Y, Z,
-                    family, method, fitted.ext,
+                    family, method, fitted,
                     alternative,
                     func = 'dCRT', B)
 
@@ -165,8 +165,8 @@ dCRT <- function(X, Y, Z,
                                           YZ = family$YZ),
                             method = list(XZ = method$XZ,
                                           YZ = method$YZ),
-                            fitted.ext = list(XZ = fitted.ext$XZ,
-                                              YZ = fitted.ext$YZ)) |> suppressWarnings()
+                            fitted = list(XZ = fitted$XZ,
+                                              YZ = fitted$YZ)) |> suppressWarnings()
 
   X_on_Z_fit_vals <- fitted_vals$X_on_Z_fit_vals
   Y_on_Z_fit_vals <- fitted_vals$Y_on_Z_fit_vals
@@ -246,7 +246,7 @@ dCRT <- function(X, Y, Z,
 #' res.spaCRT.2 <- spaCRT(X = X, Y = Y, Z = Z,
 #'                        method = list(XZ = "random_forest"),
 #'                        family = list(XZ = "binomial"),
-#'                        fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
+#'                        fitted = list(XZ = NULL, YZ = user_fit_Y),
 #'                        alternative = "greater")
 #' res.spaCRT.2
 #'
@@ -254,11 +254,11 @@ dCRT <- function(X, Y, Z,
 spaCRT <- function(X, Y, Z,
                    family,
                    method = list(XZ = 'glm', YZ = 'glm'),
-                   fitted.ext = list(XZ = NULL, YZ = NULL),
+                   fitted = list(XZ = NULL, YZ = NULL),
                    alternative = 'two.sided') {
 
   check_inputs_main(X, Y, Z,
-                    family, method, fitted.ext,
+                    family, method, fitted,
                     alternative,
                     func = 'spaCRT')
 
@@ -267,8 +267,8 @@ spaCRT <- function(X, Y, Z,
                                           YZ = family$YZ),
                             method = list(XZ = method$XZ,
                                           YZ = method$YZ),
-                            fitted.ext = list(XZ = fitted.ext$XZ,
-                                              YZ = fitted.ext$YZ)) |> suppressWarnings()
+                            fitted = list(XZ = fitted$XZ,
+                                              YZ = fitted$YZ)) |> suppressWarnings()
 
   spa_result <- spa_cdf(X = X, Y = Y,
                         X_on_Z_fit_vals = fitted_vals$X_on_Z_fit_vals,

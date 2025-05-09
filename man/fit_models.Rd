@@ -10,7 +10,7 @@ fit_models(
   Z,
   family,
   method = list(XZ = "glm", YZ = "glm"),
-  fitted.ext = list(XZ = NULL, YZ = NULL)
+  fitted = list(XZ = NULL, YZ = NULL)
 )
 }
 \arguments{
@@ -22,13 +22,13 @@ fit_models(
 
 \item{family}{Named list with elements \code{XZ} and \code{YZ} specifying the model family for \eqn{X \mid Z} and
 \eqn{Y \mid Z} for each model. Each list element must be a string (e.g. \code{"binomial"},
-\code{"poisson"}). Ignored for any model where you supply your own fitted values via \code{fitted.ext}.}
+\code{"poisson"}). Ignored for any model where you supply your own fitted values via \code{fitted}.}
 
 \item{method}{Named list with elements \code{XZ} and \code{YZ} that selects the model-fitting method to use
 for each model. Each element must be a string (e.g. \code{"glm"}, \code{"random_forest"}).
-Ignored for any model where you supply your own fitted values via \code{fitted.ext}.}
+Ignored for any model where you supply your own fitted values via \code{fitted}.}
 
-\item{fitted.ext}{Named list with elements \code{XZ} and \code{YZ} of user-supplied fitted values
+\item{fitted}{Named list with elements \code{XZ} and \code{YZ} of user-supplied fitted values
 (numeric vectors of length n). For each non-NULL element, that model is
 treated as custom and neither \code{method} nor \code{family} is used.}
 }
