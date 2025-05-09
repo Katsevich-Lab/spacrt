@@ -71,3 +71,6 @@ res.GCM.2 <- GCM(X = X, Y = Y, Z = Z,
                  alternative = "greater")
 res.GCM.2
 }
+\seealso{
+\code{\link{model_families}}
+}

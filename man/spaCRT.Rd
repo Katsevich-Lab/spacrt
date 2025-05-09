@@ -78,3 +78,6 @@ res.spaCRT.2 <- spaCRT(X = X, Y = Y, Z = Z,
 res.spaCRT.2
 
 }
+\seealso{
+\code{\link{model_families}}
+}
