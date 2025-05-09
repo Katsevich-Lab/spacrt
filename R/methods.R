@@ -60,7 +60,7 @@
 #' @export
 GCM <- function(X, Y, Z,
                 family,
-                method = list(XZ = 'glm', YZ = 'glm'),
+                method,
                 fitted.ext = list(XZ = NULL, YZ = NULL),
                 alternative = 'two.sided') {
 
@@ -111,7 +111,7 @@ GCM <- function(X, Y, Z,
 #' \code{dCRT} is a function carrying out the dCRT based on GLMs for `X|Z` and `Y|Z`.
 #'
 #' @inheritParams GCM
-#' @param B The number of resamples to draw (Default value is 2000).
+#' @param B The number of resamples to draw (Default value is 5000).
 #'
 #' @return
 #' An named list containing the following fields:
