@@ -73,6 +73,7 @@ res.dCRT.2 <- dCRT(X = X, Y = Y, Z = Z,
                    fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
                    alternative = "greater")
 res.dCRT.2
+
 }
 \seealso{
 \code{\link{model_families}}

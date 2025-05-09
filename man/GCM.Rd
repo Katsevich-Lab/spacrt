@@ -70,6 +70,7 @@ res.GCM.2 <- GCM(X = X, Y = Y, Z = Z,
                  fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
                  alternative = "greater")
 res.GCM.2
+
 }
 \seealso{
 \code{\link{model_families}}
