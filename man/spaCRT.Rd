@@ -79,5 +79,5 @@ res.spaCRT.2
 
 }
 \seealso{
-\code{\link{model_families}}
+\code{\link{supported_models}}
 }

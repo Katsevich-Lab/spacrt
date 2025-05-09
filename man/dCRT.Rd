@@ -37,7 +37,7 @@ treated as custom and neither \code{method} nor \code{family} is used.}
 \item{alternative}{A character string specifying the alternative hypothesis for the test.
 Values can be "two.sided" (default), "greater", or "less".}
 
-\item{B}{The number of resamples to draw (Default value is 2000).}
+\item{B}{The number of resamples to draw (Default value is 5000).}
 }
 \value{
 An named list containing the following fields:
@@ -76,5 +76,5 @@ res.dCRT.2
 
 }
 \seealso{
-\code{\link{model_families}}
+\code{\link{supported_models}}
 }

@@ -31,7 +31,7 @@
 #'   \item{test_stat}{The test statistic.}
 #'   \item{p_value}{The p-value under the specified alternative.}
 #' }
-#' @seealso \code{\link{model_families}}
+#' @seealso \code{\link{supported_models}}
 #' @examples
 #' n <- 200; p <- 4
 #' set.seed(1234)
@@ -119,7 +119,7 @@ GCM <- function(X, Y, Z,
 #'   \item{test_stat}{The test statistic.}
 #'   \item{p_value}{The p-value under the specified alternative.}
 #' }
-#' @seealso \code{\link{model_families}}
+#' @seealso \code{\link{supported_models}}
 #' @examples
 #' n <- 200; p <- 4
 #' set.seed(1234)
@@ -222,7 +222,7 @@ dCRT <- function(X, Y, Z,
 #'   saddlepoint equation could be solved; otherwise, the backup method (GCM)
 #'   was employed due to the failure of spaCRT.}
 #' }
-#' @seealso \code{\link{model_families}}
+#' @seealso \code{\link{supported_models}}
 #' @examples
 #' n <- 200; p <- 4
 #' set.seed(1234)

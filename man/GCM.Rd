@@ -9,7 +9,7 @@ GCM(
   Y,
   Z,
   family,
-  method = list(XZ = "glm", YZ = "glm"),
+  method,
   fitted.ext = list(XZ = NULL, YZ = NULL),
   alternative = "two.sided"
 )
@@ -73,5 +73,5 @@ res.GCM.2
 
 }
 \seealso{
-\code{\link{model_families}}
+\code{\link{supported_models}}
 }

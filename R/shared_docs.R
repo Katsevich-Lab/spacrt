@@ -29,8 +29,9 @@
 #'
 #' Other methods may be added in future versions.
 #'
-#' @name model_families
+#' @name supported_models
+#' @aliases supported_models
 #' @title Supported Model Families and Fitting Methods for Inference
-#' @keywords internal
+#' @keywords documentation
 #' @seealso \code{\link{GCM}}, \code{\link{dCRT}}, \code{\link{spaCRT}}
 NULL
