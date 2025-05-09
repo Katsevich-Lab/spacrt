@@ -7,14 +7,14 @@ Authors@R: c(
     person("Eugene", "Katsevich", , "ekatsevi@wharton.upenn.edu", role = c("aut"))
     )
 Description: 
-    Implements methods for testing conditional independence between variables given covariates, 
-    including the Generalized Covariance Measure (GCM), the Distilled Conditional Randomization 
-    Test (dCRT), and the Saddlepoint Approximation based Conditional Randomization Test (spaCRT). 
-    spaCRT, in particular, approximates the resampling distribution of dCRT test statistic using 
-    saddlepoint approximation, achieving comparable statistical performance, namely, type-I error
-    control, p-value calibration, and power, while substantially reducing computational cost.
-    All these procedures assess conditional independence between variables given covariates, and 
-    support flexible model-fitting strategies for the conditional distributions. 
+    Implements the Saddlepoint Approximation based Conditional Randomization Test (spaCRT) for 
+    testing conditional independence between a predictor and a response variable, conditionally
+    on a set of covariates. The package also implements two related conditional independence tests, 
+    the Generalized Covariance Measure (GCM) test (Shah and Peters 2020) and the Distilled 
+    Conditional Randomization Test (dCRT; Liu et al 2022). The spaCRT approximates the 
+    resampling distribution of the dCRT test statistic using saddlepoint approximation, achieving 
+    comparable statistical performance, while substantially reducing computational cost. All 
+    three procedures support flexible model-fitting strategies for the conditional distributions.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -23,7 +23,7 @@ Depends: R (>= 4.1.0)
 Imports: 
     stats, MASS, Rcpp, ranger
 Suggests:
-    sceptre, xgboost, testthat (>= 3.0.0)
+    xgboost, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 LinkingTo: 
     Rcpp, BH
