@@ -6,7 +6,15 @@ Authors@R: c(
     person("Ziang", "Niu", , "ziangniu@upenn.edu", role = c("aut")),
     person("Eugene", "Katsevich", , "ekatsevi@wharton.upenn.edu", role = c("aut"))
     )
-Description: The saddlepoint approximation-based conditional randomization test, abbreviated as `spaCRT`, is a fast and accurate method for testing conditional independence. By approximating the resampling distribution of the distilled conditional randomization test (dCRT) using saddlepoint approximation, spaCRT achieves similar statistical performance in terms of type-I error control, p-value calibration, and power; with substantially lower computational cost.
+Description: 
+    Implements methods for testing conditional independence between variables given covariates, 
+    including the Generalized Covariance Measure (GCM), the Distilled Conditional Randomization 
+    Test (dCRT), and the Saddlepoint Approximation-based Conditional Randomization Test (spaCRT). 
+    In particular, spaCRT approximates the resampling distribution of dCRT test statistic using 
+    saddlepoint approximation, achieving comparable statistical performance, namely, type-I error
+    control, p-value calibration, and power, while substantially reducing computational cost.
+    All these procedures assess conditional independence between variables given covariates, and 
+    support flexible model-fitting strategies for the conditional distributions. 
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
