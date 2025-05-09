@@ -1,4 +1,4 @@
-#' Supported Families and Inference Methods
+#' Supported Families and Model-fitting Methods
 #'
 #' This page documents the families and fitting methods supported in the \code{X | Z} and
 #' \code{Y | Z} models for functions \code{\link{GCM}}, \code{\link{dCRT}}, and \code{\link{spaCRT}}.
@@ -23,8 +23,7 @@
 #' \strong{Supported Fitting Methods:}
 #' \itemize{
 #'   \item \code{"glm"}
-#'   \item \code{"rf"}
-#'   \item \code{"prob_forest"}
+#'   \item \code{"random_forest"}
 #' }
 #'
 #' Other methods may be added in future versions.
