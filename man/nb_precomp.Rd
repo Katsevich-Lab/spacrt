@@ -8,9 +8,9 @@ binomial regression}
 nb_precomp(V, Z)
 }
 \arguments{
-\item{V}{A list containing the response V}
+\item{V}{A list containing the response}
 
-\item{Z}{A list containing the covariate Z}
+\item{Z}{A list containing the covariate}
 }
 \value{
 A named list with the following components:
