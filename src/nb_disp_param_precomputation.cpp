@@ -1,3 +1,9 @@
+// Adapted from the sceptre package: https://github.com/katsevich-lab/sceptre
+// Original authors: Timothy Barry, Joseph Deutsch, and Eugene Katsevich
+// License: GPL-3
+// This code is vendored into this package to avoid a runtime dependency on sceptre.
+
+
 // [[Rcpp::depends(BH)]]
 
 #include <Rcpp.h>
