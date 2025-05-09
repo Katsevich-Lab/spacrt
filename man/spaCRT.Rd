@@ -39,9 +39,9 @@ Values can be "two.sided" (default), "greater", or "less".}
 \value{
 A named list containing the following fields:
 \describe{
-\item{\code{test_stat}}{The test statistic.}
-\item{\code{p_value}}{The p-value under the specified alternative.}
-\item{\code{spa.success}}{A logical variable that returns TRUE if the
+\item{test_stat}{The test statistic.}
+\item{p_value}{The p-value under the specified alternative.}
+\item{spa.success}{A logical variable that returns TRUE if the
 saddlepoint equation could be solved; otherwise, the backup method (GCM)
 was employed due to the failure of spaCRT.}
 }
