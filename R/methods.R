@@ -56,6 +56,7 @@
 #'                  fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
 #'                  alternative = "greater")
 #' res.GCM.2
+#'
 #' @export
 GCM <- function(X, Y, Z,
                 family,
@@ -143,6 +144,7 @@ GCM <- function(X, Y, Z,
 #'                    fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
 #'                    alternative = "greater")
 #' res.dCRT.2
+#'
 #' @export
 dCRT <- function(X, Y, Z,
                  family,
