@@ -232,8 +232,8 @@ d2_wcgf <- function(s, P, W, fam){
 #' \code{nb_precomp} is a function computing the dispersion parameter in negative
 #' binomial regression
 #'
-#' @param V A list containing the response V
-#' @param Z A list containing the covariate Z
+#' @param V A list containing the response
+#' @param Z A list containing the covariate
 #'
 #' @return A named list with the following components:
 #' \describe{
@@ -243,8 +243,6 @@ d2_wcgf <- function(s, P, W, fam){
 #'
 #' @keywords internal
 nb_precomp <- function(V,Z){
-
-  # Y <- data$Y; Z <- data$Z
 
   # Fit Poisson GLM: Y ~ Z with intercept
   pois_fit <- stats::glm.fit(y = V, x = cbind(1,Z), family = stats::poisson())
