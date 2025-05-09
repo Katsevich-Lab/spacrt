@@ -9,8 +9,8 @@ Authors@R: c(
 Description: 
     Implements methods for testing conditional independence between variables given covariates, 
     including the Generalized Covariance Measure (GCM), the Distilled Conditional Randomization 
-    Test (dCRT), and the Saddlepoint Approximation-based Conditional Randomization Test (spaCRT). 
-    In particular, spaCRT approximates the resampling distribution of dCRT test statistic using 
+    Test (dCRT), and the Saddlepoint Approximation based Conditional Randomization Test (spaCRT). 
+    spaCRT, in particular, approximates the resampling distribution of dCRT test statistic using 
     saddlepoint approximation, achieving comparable statistical performance, namely, type-I error
     control, p-value calibration, and power, while substantially reducing computational cost.
     All these procedures assess conditional independence between variables given covariates, and 
