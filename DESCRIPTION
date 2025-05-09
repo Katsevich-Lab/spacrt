@@ -21,9 +21,9 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Depends: R (>= 4.1.0)
 Imports: 
-    stats, MASS, Rcpp
+    stats, MASS, Rcpp, ranger
 Suggests:
-    sceptre, statmod, ranger, xgboost, testthat (>= 3.0.0)
+    sceptre, xgboost, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 LinkingTo: 
     Rcpp, BH
