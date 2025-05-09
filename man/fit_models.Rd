@@ -25,7 +25,7 @@ fit_models(
 \code{"poisson"}). Ignored for any model where you supply your own fitted values via \code{fitted.ext}.}
 
 \item{method}{Named list with elements \code{XZ} and \code{YZ} that selects the model-fitting method to use
-for each model. Each element must be a string (e.g. \code{"glm"}, \code{"rf"}, \code{"prob_forest"}).
+for each model. Each element must be a string (e.g. \code{"glm"}, \code{"random_forest"}).
 Ignored for any model where you supply your own fitted values via \code{fitted.ext}.}
 
 \item{fitted.ext}{Named list with elements \code{XZ} and \code{YZ} of user-supplied fitted values

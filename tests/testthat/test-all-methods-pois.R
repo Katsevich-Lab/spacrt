@@ -11,7 +11,7 @@ data <- list(X = rbinom(n = n, size = 1, prob = 0.4),
 X <- data$X; Y <- data$Y; Z <- data$Z
 
 X_on_Z_fam <- "binomial"; Y_on_Z_fam <- "poisson"
-fitting_X_on_Z <- 'rf'; fitting_Y_on_Z <- 'glm'
+fitting_X_on_Z <- 'random_forest'; fitting_Y_on_Z <- 'glm'
 
 results_GCM <- GCM(X, Y, Z,
                    family = list(XZ = X_on_Z_fam, YZ = Y_on_Z_fam),

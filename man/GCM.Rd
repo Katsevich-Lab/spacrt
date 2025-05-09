@@ -26,7 +26,7 @@ GCM(
 \code{"poisson"}). Ignored for any model where you supply your own fitted values via \code{fitted.ext}.}
 
 \item{method}{Named list with elements \code{XZ} and \code{YZ} that selects the model-fitting method to use
-for each model. Each element must be a string (e.g. \code{"glm"}, \code{"rf"}, \code{"prob_forest"}).
+for each model. Each element must be a string (e.g. \code{"glm"}, \code{"random_forest"}).
 Ignored for any model where you supply your own fitted values via \code{fitted.ext}.}
 
 \item{fitted.ext}{Named list with elements \code{XZ} and \code{YZ} of user-supplied fitted values
@@ -65,7 +65,7 @@ user_fit_Y <- glm(Y ~ Z,
                   data = data.frame(Y = Y, Z = Z))$fitted.values |> unname()
 
 res.GCM.2 <- GCM(X = X, Y = Y, Z = Z,
-                 method = list(XZ = "rf"),
+                 method = list(XZ = "random_forest"),
                  family = list(XZ = "binomial"),
                  fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
                  alternative = "greater")

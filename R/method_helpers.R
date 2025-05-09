@@ -300,7 +300,7 @@ fit_models <- function(X, Y, Z,
 #' @param V_on_Z_fam The GLM family for the regression of V on Z
 #' (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).
 #' @param fitting_V_on_Z The fitting method for the regression V on Z
-#' (values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).
+#' (values can be \code{glm} (default) or \code{random_forest}).
 #' @param fit_vals_V_on_Z_own Vector of fitted values for V on Z in case the user's custom method.
 #' Works only if fitting_V_on_Z = 'own'.
 #'
@@ -329,7 +329,7 @@ fit_single_model <- function(V, Z,
         V_on_Z_fit <- suppressWarnings(stats::glm(V ~ Z, family = V_on_Z_fam))
         V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
       }
-    } else if(fitting_V_on_Z %in% c('rf','prob_forest')){
+    } else if(fitting_V_on_Z == 'random_forest'){
       # fit V on Z regression when fitting method is random forest
       Z <- as.data.frame(Z)
       colnames(Z) <- paste0("V", seq_len(ncol(Z)))
@@ -375,7 +375,7 @@ fit_single_model <- function(V, Z,
 #' @param family Named list with elements \code{XZ} and \code{YZ}, each a character string
 #'   specifying the model family for \eqn{X \mid Z} and \eqn{Y \mid Z}, respectively.
 #' @param method Named list with elements \code{XZ} and \code{YZ}, each a character string
-#'   indicating the model-fitting method to use, e.g., \code{"glm"}, \code{"rf"}.
+#'   indicating the model-fitting method to use, e.g., \code{"glm"}, \code{"random_forest"}.
 #' @param fitted.ext Named list with elements \code{XZ} and \code{YZ}, each either \code{NULL}
 #'   or a numeric vector of length \eqn{n} representing user-supplied fitted values.
 #' @param alternative Character string indicating the alternative hypothesis for the test.
@@ -402,6 +402,10 @@ check_inputs_main <- function(X, Y, Z,
   if(!is.matrix(Z) || !is.numeric(Z)) stop("`Z` must be a numeric matrix.")
   if(nrow(Z) != n) stop("`Z` must have the same number of rows as `X` and `Y`.")
 
+  # supported families and fitting methods
+  supported_families <- c("binomial", "poisson","negative.binomial")
+  supported_methods  <- c("glm", "random_forest")
+
   # Check fitted.ext
   if (!is.list(fitted.ext) || !setequal(names(fitted.ext), c("XZ", "YZ"))) {
     stop("`fitted.ext` must be a named list with exactly two elements: 'XZ' and 'YZ'.")
@@ -425,6 +429,8 @@ check_inputs_main <- function(X, Y, Z,
       family_val <- family[[name]]
       if (!is.character(family_val) || length(family_val) != 1)
         stop(sprintf("`family$%s` must be a character string.", name))
+      if (!(family_val %in% supported_families))
+        stop(sprintf("`family$%s` must be one of: %s.", name, paste(supported_families, collapse = ", ")))
     }
   }
 
@@ -439,6 +445,8 @@ check_inputs_main <- function(X, Y, Z,
       method_val <- method[[name]]
       if (!is.character(method_val) || length(method_val) != 1)
         stop(sprintf("`method$%s` must be a character string.", name))
+      if (!(method_val %in% supported_methods))
+        stop(sprintf("`method$%s` must be one of: %s.", name, paste(supported_methods, collapse = ", ")))
     }
   }
 

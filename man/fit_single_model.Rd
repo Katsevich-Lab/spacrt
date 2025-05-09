@@ -16,7 +16,7 @@ fit_single_model(V, Z, V_on_Z_fam, fitting_V_on_Z, fit_vals_V_on_Z_own)
 (values can be \code{gaussian}, \code{binomial}, \code{poisson}, \code{negative.binomial}, etc).}
 
 \item{fitting_V_on_Z}{The fitting method for the regression V on Z
-(values can be \code{glm} (default), \code{rf}, \code{prob_forest}, or \code{own}).}
+(values can be \code{glm} (default) or \code{random_forest}).}
 
 \item{fit_vals_V_on_Z_own}{Vector of fitted values for V on Z in case the user's custom method.
 Works only if fitting_V_on_Z = 'own'.}

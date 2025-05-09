@@ -15,7 +15,7 @@
 #'   `"poisson"`). Ignored for any model where you supply your own fitted values via `fitted.ext`.
 #' @param method
 #'   Named list with elements `XZ` and `YZ` that selects the model-fitting method to use
-#'   for each model. Each element must be a string (e.g. `"glm"`, `"rf"`, `"prob_forest"`).
+#'   for each model. Each element must be a string (e.g. `"glm"`, `"random_forest"`).
 #'   Ignored for any model where you supply your own fitted values via `fitted.ext`.
 #' @param fitted.ext
 #'   Named list with elements `XZ` and `YZ` of user-supplied fitted values
@@ -51,7 +51,7 @@
 #'                   data = data.frame(Y = Y, Z = Z))$fitted.values |> unname()
 #'
 #' res.GCM.2 <- GCM(X = X, Y = Y, Z = Z,
-#'                  method = list(XZ = "rf"),
+#'                  method = list(XZ = "random_forest"),
 #'                  family = list(XZ = "binomial"),
 #'                  fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
 #'                  alternative = "greater")
@@ -139,7 +139,7 @@ GCM <- function(X, Y, Z,
 #'                   data = data.frame(Y = Y, Z = Z))$fitted.values |> unname()
 #'
 #' res.dCRT.2 <- dCRT(X = X, Y = Y, Z = Z,
-#'                    method = list(XZ = "rf"),
+#'                    method = list(XZ = "random_forest"),
 #'                    family = list(XZ = "binomial"),
 #'                    fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
 #'                    alternative = "greater")
@@ -244,7 +244,7 @@ dCRT <- function(X, Y, Z,
 #' user_fit_Y <- stats::predict(model.Y, newdata = Z)
 #'
 #' res.spaCRT.2 <- spaCRT(X = X, Y = Y, Z = Z,
-#'                        method = list(XZ = "rf"),
+#'                        method = list(XZ = "random_forest"),
 #'                        family = list(XZ = "binomial"),
 #'                        fitted.ext = list(XZ = NULL, YZ = user_fit_Y),
 #'                        alternative = "greater")
