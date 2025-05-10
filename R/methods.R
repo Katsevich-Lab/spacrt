@@ -142,7 +142,8 @@ GCM <- function(X, Y, Z,
 #'                    family = list(XZ = "binomial"),
 #'                    method = list(XZ = "random_forest"),
 #'                    fitted = list(XZ = NULL, YZ = user_fit_Y),
-#'                    alternative = "greater")
+#'                    alternative = "greater",
+#'                    B = 10000)
 #' res.dCRT.2
 #'
 #' @export
