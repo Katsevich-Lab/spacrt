@@ -71,8 +71,8 @@ model.Y <- xgboost::xgboost(data = dtrain,
 user_fit_Y <- stats::predict(model.Y, newdata = Z)
 
 res.spaCRT.2 <- spaCRT(X = X, Y = Y, Z = Z,
-                       method = list(XZ = "random_forest"),
                        family = list(XZ = "binomial"),
+                       method = list(XZ = "random_forest"),
                        fitted = list(XZ = NULL, YZ = user_fit_Y),
                        alternative = "greater")
 res.spaCRT.2

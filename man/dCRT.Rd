@@ -68,10 +68,11 @@ user_fit_Y <- glm(Y ~ Z,
                   data = data.frame(Y = Y, Z = Z))$fitted.values |> unname()
 
 res.dCRT.2 <- dCRT(X = X, Y = Y, Z = Z,
-                   method = list(XZ = "random_forest"),
                    family = list(XZ = "binomial"),
+                   method = list(XZ = "random_forest"),
                    fitted = list(XZ = NULL, YZ = user_fit_Y),
-                   alternative = "greater")
+                   alternative = "greater",
+                   B = 10000)
 res.dCRT.2
 
 }

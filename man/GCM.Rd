@@ -65,8 +65,8 @@ user_fit_Y <- glm(Y ~ Z,
                   data = data.frame(Y = Y, Z = Z))$fitted.values |> unname()
 
 res.GCM.2 <- GCM(X = X, Y = Y, Z = Z,
-                 method = list(XZ = "random_forest"),
                  family = list(XZ = "binomial"),
+                 method = list(XZ = "random_forest"),
                  fitted = list(XZ = NULL, YZ = user_fit_Y),
                  alternative = "greater")
 res.GCM.2
