@@ -245,15 +245,15 @@ d2_wcgf <- function(s, P, W, fam){
 nb_precomp <- function(V,Z){
 
   # Fit Poisson GLM: Y ~ Z with intercept
-  pois_fit <- stats::glm.fit(y = V, x = cbind(1,Z), family = stats::poisson())
+  pois_fit <- stats::glm.fit(y = V, x = cbind(1, Z), family = stats::poisson())
 
   # Estimate NB dispersion parameter using C++ function estimate_theta
   theta_hat <- estimate_theta(
     y = V,
     mu = pois_fit$fitted.values,
     dfr = pois_fit$df.residual,
-    limit = 50,
-    eps = (.Machine$double.eps)^(1/4)
+    limit = 200,
+    eps = (.Machine$double.eps)^(1/2)
   )[[1]]
 
   return(list(fitted_values = pois_fit$fitted.values,
