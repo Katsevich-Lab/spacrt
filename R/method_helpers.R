@@ -256,8 +256,8 @@ nb_precomp <- function(V,Z){
     eps = (.Machine$double.eps)^(1/2)
   )[[1]]
 
-  # if truncate theta at 1e-4 if it is less than that
-  theta_hat <- max(1e-4, theta_hat)
+  # if truncate theta at 5e-3 if it is less than that
+  theta_hat <- max(5e-3, theta_hat)
 
   return(list(fitted_values = pois_fit$fitted.values,
               theta_hat = theta_hat))
