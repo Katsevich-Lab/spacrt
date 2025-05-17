@@ -368,7 +368,7 @@ fit_single_model <- function(V, Z,
 }
 
 ############################################################################################
-#' Validate inputs to the GCM function
+#' Validate inputs to the main functions
 #'
 #' \code{check_inputs_main} is a utility function that checks whether the arguments provided to
 #' \code{GCM()}, \code{dCRT()} and \code{spaCRT()} satisfy the required structure and types.
