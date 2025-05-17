@@ -334,22 +334,23 @@ fit_single_model <- function(V, Z,
       }
     } else if(fitting_V_on_Z == 'random_forest'){
       # fit V on Z regression when fitting method is random forest
-      Z <- as.data.frame(Z)
-      colnames(Z) <- paste0("V", seq_len(ncol(Z)))
+      # Z <- as.data.frame(Z)
+      # colnames(Z) <- paste0("V", seq_len(ncol(Z)))
 
       discrete_fam <- c('binomial','poisson','negative.binomial')
 
       if(V_on_Z_fam %in% discrete_fam){
         # V_on_Z_fam is discrete
-        rf_fit <- ranger::ranger(y = as.factor(V), x = Z, probability = TRUE)
-        pred_probs <- stats::predict(rf_fit, data = Z)$predictions
+        rf_fit <- grf::probability_forest(X = Z, Y = as.factor(V))
+        pred_probs <- stats::predict(rf_fit, data = Z,
+                                     estimate.variance = FALSE)$predictions
 
         # Extract probability for class "1" if present; otherwise use first level
-        target_class <- if("1" %in% colnames(pred_probs)) "1" else colnames(pred_probs)[1]
+        target_class <- if ("1" %in% colnames(pred_probs)) "1" else colnames(pred_probs)[1]
         V_on_Z_fit_vals <- pred_probs[, target_class]
       } else{
         # V_on_Z_fam is continuous
-        rf_fit <- ranger::ranger(y = V, x = Z)
+        rf_fit <- grf::regression_forest(X = Z, Y = V)
         V_on_Z_fit_vals <- stats::predict(rf_fit, data = Z)$predictions
       }
     }
