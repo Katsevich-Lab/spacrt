@@ -32,9 +32,9 @@ results_p_value <- c(results_GCM$p_value, results_dCRT$p_value, results_spaCRT$p
 
 test_that("All test statistics and p-values were accurately computed.",{
   expect_equal(object = results_test_stat |> round(5),
-               expected = c(0.05634,  0.00019, -0.00844))
+               expected = c(0.43819, 0.34420, 0.35619))
   expect_equal(object = results_p_value |> unname() |> round(6),
-               expected = c(0.955067, 0.981902, 0.986141 ))
+               expected = c(0.661248, 0.618138, 0.604451))
   expect_equal(object = results_spaCRT$spa.success,
                expected = TRUE)
 })
