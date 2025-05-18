@@ -322,9 +322,19 @@ fit_single_model <- function(V, Z,
         # V_on_Z_fam == "negative.binomial"
         aux_info_V_on_Z <- nb_precomp(V = V, Z = Z)
 
-        V_on_Z_fit <- stats::glm(V ~ Z,
-                                 family = MASS::negative.binomial(aux_info_V_on_Z$theta_hat),
-                                 mustart = aux_info_V_on_Z$fitted_values) |> suppressWarnings()
+        # switch to Poisson if negative binomial regression fails
+        tryCatch({
+          # fit NB regression
+          V_on_Z_fit <- stats::glm(V ~ Z,
+                                   family = MASS::negative.binomial(aux_info_V_on_Z$theta_hat),
+                                   mustart = aux_info_V_on_Z$fitted_values) |> suppressWarnings()
+        },
+        error = function(e){
+          # fit Poisson regression
+          V_on_Z_fit <- stats::glm(V ~ Z,
+                                   family = stats::poisson(),
+                                   mustart = aux_info_V_on_Z$fitted_values) |> suppressWarnings()
+        })
 
         V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
       } else{
@@ -333,10 +343,8 @@ fit_single_model <- function(V, Z,
         V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
       }
     } else if(fitting_V_on_Z == 'random_forest'){
-      # fit V on Z regression when fitting method is random forest
-      # Z <- as.data.frame(Z)
-      # colnames(Z) <- paste0("V", seq_len(ncol(Z)))
 
+      # fit V on Z regression when fitting method is random forest
       discrete_fam <- c('binomial','poisson','negative.binomial')
 
       if(V_on_Z_fam %in% discrete_fam){

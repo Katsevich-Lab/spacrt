@@ -2,7 +2,7 @@
 % Please edit documentation in R/method_helpers.R
 \name{check_inputs_main}
 \alias{check_inputs_main}
-\title{Validate inputs to the GCM function}
+\title{Validate inputs to the main functions}
 \usage{
 check_inputs_main(
   X,
