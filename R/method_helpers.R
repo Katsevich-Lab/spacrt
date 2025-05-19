@@ -323,16 +323,16 @@ fit_single_model <- function(V, Z,
         aux_info_V_on_Z <- nb_precomp(V = V, Z = Z)
 
         # switch to Poisson if negative binomial regression fails
-        tryCatch({
+        V_on_Z_fit_vals <- tryCatch({
           # fit NB regression
           V_on_Z_fit <- stats::glm(V ~ Z,
                                    family = MASS::negative.binomial(aux_info_V_on_Z$theta_hat),
                                    mustart = aux_info_V_on_Z$fitted_values) |> suppressWarnings()
-          V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
+          V_on_Z_fit$fitted.values
         },
         error = function(e){
           # fit Poisson regression
-          V_on_Z_fit_vals <- aux_info_V_on_Z$fitted_values
+          aux_info_V_on_Z$fitted_values
         })
       } else{
         # V_on_Z_fam == any other glm family
