@@ -256,8 +256,8 @@ nb_precomp <- function(V,Z){
     eps = (.Machine$double.eps)^(1/2)
   )[[1]]
 
-  # truncate theta at 5e-2 if it is less than that
-  theta_hat <- max(5e-2, theta_hat)
+  # truncate theta at 1e-4 if it is less than that
+  theta_hat <- max(1e-4, theta_hat)
 
   return(list(fitted_values = pois_fit$fitted.values,
               theta_hat = theta_hat))
@@ -328,15 +328,12 @@ fit_single_model <- function(V, Z,
           V_on_Z_fit <- stats::glm(V ~ Z,
                                    family = MASS::negative.binomial(aux_info_V_on_Z$theta_hat),
                                    mustart = aux_info_V_on_Z$fitted_values) |> suppressWarnings()
+          V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
         },
         error = function(e){
           # fit Poisson regression
-          V_on_Z_fit <- stats::glm(V ~ Z,
-                                   family = stats::poisson(),
-                                   mustart = aux_info_V_on_Z$fitted_values) |> suppressWarnings()
+          V_on_Z_fit_vals <- aux_info_V_on_Z$fitted_values
         })
-
-        V_on_Z_fit_vals <- V_on_Z_fit$fitted.values
       } else{
         # V_on_Z_fam == any other glm family
         V_on_Z_fit <- suppressWarnings(stats::glm(V ~ Z, family = V_on_Z_fam))
