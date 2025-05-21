@@ -346,7 +346,7 @@ fit_single_model <- function(V, Z,
 
       if(V_on_Z_fam %in% discrete_fam){
         # V_on_Z_fam is discrete
-        rf_fit <- grf::probability_forest(X = Z, Y = as.factor(V))
+        rf_fit <- grf::probability_forest(X = Z, Y = as.factor(V), num.threads = 2)
         pred_probs <- stats::predict(rf_fit, data = Z,
                                      estimate.variance = FALSE)$predictions
 
@@ -355,7 +355,7 @@ fit_single_model <- function(V, Z,
         V_on_Z_fit_vals <- pred_probs[, target_class]
       } else{
         # V_on_Z_fam is continuous
-        rf_fit <- grf::regression_forest(X = Z, Y = V)
+        rf_fit <- grf::regression_forest(X = Z, Y = V, num.threads = 2)
         V_on_Z_fit_vals <- stats::predict(rf_fit, data = Z)$predictions
       }
     }
